@@ -189,7 +189,7 @@
           <button type="button" class="muted-btn" onclick="clearFilter()">顯示全部</button>
         </div>
 
-        <div class="small">編輯模式：點地圖本體新增標記、按住標記拖曳移動、點標記可修改。觀看模式：不會誤新增。電腦右鍵或手機長按標記可刪除。</div>
+        <div class="small">必須先填寫你的名字才能標記。編輯模式：點地圖本體新增標記、按住標記拖曳移動、點標記可修改。觀看模式：不會誤新增。電腦右鍵或手機長按標記可刪除。</div>
       </div>
 
       <div class="card">
@@ -234,6 +234,7 @@
       <h3 id="modalTitle" style="margin-top:0;">新增標記</h3>
       <label>名稱</label>
       <input id="markerName" placeholder="請輸入標記名稱" />
+      <div id="markerOwnerInfo" class="small" style="margin-top:6px;"></div>
       <label>備註</label>
       <textarea id="markerNote" placeholder="可填價格、用途、說明"></textarea>
       <div class="row" style="margin-top:10px;">
@@ -554,6 +555,12 @@
       dragInfo.active = false;
       if (!dragInfo.moved && !pinchInfo) {
         if (!editMode) return;
+        const player = $("playerName").value.trim();
+        if (!player) {
+          alert("請先在左側填寫你的名字，才可以新增標記。");
+          $("playerName").focus();
+          return;
+        }
         // 只允許在圖片本體、且不是外圍藍色背景的位置新增標記
         if (!isPointAllowedForMarker(e.clientX, e.clientY)) return;
         pendingPoint = screenToImage(e.clientX, e.clientY);
@@ -609,7 +616,7 @@
         btn.className = "marker";
         btn.style.left = (marker.xPct * imgSize.w / 100) + "px";
         btn.style.top = (marker.yPct * imgSize.h / 100) + "px";
-        btn.innerHTML = `${marker.icon}<span class="marker-label">${escapeHtml(marker.name)}</span>`;
+        btn.innerHTML = `${marker.icon}<span class="marker-label">${escapeHtml(marker.name)}｜${escapeHtml(marker.owner || "未命名")}</span>`;
         btn.title = marker.name;
 
         // 拖曳標記：按住標記移動，放開後自動儲存位置
@@ -666,7 +673,7 @@
       $("markerList").innerHTML = markers.map(marker => `
         <button type="button" class="marker-item" onclick="openEditModal('${marker.id}')">
           <div><strong>${marker.icon} ${escapeHtml(marker.name)}</strong></div>
-          <div class="small">${escapeHtml(marker.owner || "匿名")}${marker.note ? "｜" + escapeHtml(marker.note) : ""}</div>
+          <div class="small">建立者：${escapeHtml(marker.owner || "未命名")}${marker.note ? "｜" + escapeHtml(marker.note) : ""}</div>
         </button>
       `).join("");
     }
@@ -677,6 +684,8 @@
       $("markerName").value = "";
       $("markerNote").value = "";
       $("deleteBtn").style.display = "none";
+      const ownerInfo = $("markerOwnerInfo");
+      if (ownerInfo) ownerInfo.textContent = "建立者：將使用左側填寫的名字";
       modal.style.display = "flex";
     }
 
@@ -687,6 +696,8 @@
       $("modalTitle").textContent = "編輯標記";
       $("markerName").value = marker.name;
       $("markerNote").value = marker.note || "";
+      const ownerInfo = $("markerOwnerInfo");
+      if (ownerInfo) ownerInfo.textContent = "建立者：" + (marker.owner || "未命名");
       $("deleteBtn").style.display = "block";
       modal.style.display = "flex";
     }
@@ -711,6 +722,13 @@
         marker.note = $("markerNote").value.trim();
         marker.updatedAt = Date.now();
       } else {
+        const player = $("playerName").value.trim();
+        if (!player) {
+          alert("請先在左側填寫你的名字，才可以新增標記。");
+          closeModal();
+          $("playerName").focus();
+          return;
+        }
         const icon = $("customIcon").value.trim() || selectedIcon;
         markers.push({
           id: crypto.randomUUID(),
@@ -719,7 +737,7 @@
           icon,
           name,
           note: $("markerNote").value.trim(),
-          owner: $("playerName").value.trim() || "匿名",
+          owner: player,
           createdAt: Date.now(),
         });
       }
