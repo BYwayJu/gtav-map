@@ -7,193 +7,46 @@
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif; background: #0b1020; color: #fff; }
-    .app {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      height: 100vh;
-    }
-    .sidebar {
-      border-right: 1px solid #243047;
-      background: #101827;
-      padding: 14px;
-      overflow: auto;
-    }
-    .viewer {
-      position: relative;
-      overflow: hidden;
-      background: #243845;
-      touch-action: none;
-    }
-    .card {
-      background: #0f172a;
-      border: 1px solid #2d3c57;
-      border-radius: 16px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
+    .app { display: grid; grid-template-columns: 360px 1fr; height: 100vh; }
+    .sidebar { border-right: 1px solid #243047; background: #101827; padding: 14px; overflow: auto; }
+    .viewer { position: relative; overflow: hidden; background: #243845; touch-action: none; }
+    .card { background: #0f172a; border: 1px solid #2d3c57; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
     .title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
     .subtitle { font-size: 13px; color: #c7d2fe; line-height: 1.5; }
     label { display: block; font-size: 13px; margin: 8px 0 4px; color: #dbeafe; }
-    input, select, textarea, button {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid #334155;
-      background: #111c31;
-      color: white;
-      padding: 10px 12px;
-      font-size: 14px;
-    }
+    input, select, textarea, button { width: 100%; border-radius: 12px; border: 1px solid #334155; background: #111c31; color: white; padding: 10px 12px; font-size: 14px; }
     textarea { min-height: 90px; resize: vertical; }
-    button {
-      cursor: pointer;
-      font-weight: 700;
-      background: #0891b2;
-      border: none;
-    }
+    button { cursor: pointer; font-weight: 700; background: #0891b2; border: none; }
     .muted-btn { background: #334155; }
     .danger { background: #991b1b; }
     .row { display: flex; gap: 8px; }
     .row > * { flex: 1; }
-    .icon-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      max-height: 260px;
-      overflow: auto;
-      margin-top: 8px;
-    }
-    .icon-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      min-height: 62px;
-      font-size: 22px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      padding: 8px 6px;
-    }
-    .icon-btn span {
-      font-size: 11px;
-      line-height: 1.2;
-      text-align: center;
-      color: #d1d5db;
-      font-weight: 500;
-    }
-    .icon-btn.active {
-      outline: 2px solid #22d3ee;
-      background: #0e7490;
-    }
-    .topbar {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 10;
-      display: flex;
-      gap: 8px;
-    }
-    .topbar button {
-      width: auto;
-      min-width: 44px;
-      padding: 10px 12px;
-      background: rgba(15,23,42,.9);
-      border: 1px solid #334155;
-    }
-    .hint {
-      position: absolute;
-      left: 12px;
-      bottom: 12px;
-      z-index: 10;
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: rgba(15,23,42,.88);
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      font-size: 12px;
-    }
-    #stage {
-      position: absolute;
-      left: 0;
-      top: 0;
-      transform-origin: 0 0;
-      will-change: transform;
-    }
-    #stage img {
-      display: block;
-      user-select: none;
-      -webkit-user-drag: none;
-      max-width: none;
-    }
-    .marker {
-      position: absolute;
-      transform: translate(-50%, -100%);
-      background: transparent;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      font-size: 28px;
-      line-height: 1;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,.8));
-    }
-    .marker-label {
-      margin-top: 2px;
-      display: block;
-      white-space: nowrap;
-      border-radius: 999px;
-      font-size: 12px;
-      background: rgba(15,23,42,.88);
-      border: 1px solid #334155;
-      padding: 2px 7px;
-      transform: translateX(-28%);
-      color: #fff;
-    }
-    .small {
-      font-size: 12px;
-      color: #cbd5e1;
-      line-height: 1.5;
-    }
+    .icon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 260px; overflow: auto; margin-top: 8px; }
+    .icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 62px; font-size: 22px; background: #1e293b; border: 1px solid #334155; padding: 8px 6px; }
+    .icon-btn span { font-size: 11px; line-height: 1.2; text-align: center; color: #d1d5db; font-weight: 500; }
+    .icon-btn.active { outline: 2px solid #22d3ee; background: #0e7490; }
+    .topbar { position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; gap: 8px; pointer-events: auto; }
+    .topbar button { width: auto; min-width: 44px; padding: 10px 12px; background: rgba(15,23,42,.92); border: 1px solid #334155; }
+    .hint { position: absolute; left: 12px; bottom: 12px; z-index: 10; padding: 8px 10px; border-radius: 12px; background: rgba(15,23,42,.88); border: 1px solid #334155; color: #cbd5e1; font-size: 12px; }
+    #stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+    #stage img { display: block; user-select: none; -webkit-user-drag: none; max-width: none; }
+    .marker { position: absolute; transform: translate(-50%, -100%); background: transparent; border: none; padding: 0; cursor: pointer; font-size: 28px; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,.8)); width: auto; }
+    /* 修正：不要讓名稱標籤一直顯示，避免被縮放後變成一條一條黑線 */
+    .marker-label { display: none; margin-top: 2px; white-space: nowrap; border-radius: 999px; font-size: 12px; background: rgba(15,23,42,.90); border: 1px solid #334155; padding: 2px 7px; transform: translateX(-28%); color: #fff; }
+    .marker:hover .marker-label, .marker:focus .marker-label { display: block; }
+    .small { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
     .status-ok { color: #86efac; }
     .status-warn { color: #fde68a; }
     .status-bad { color: #fca5a5; }
-    .marker-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .marker-item {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 10px;
-      text-align: left;
-    }
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 20;
-    }
-    .modal-box {
-      width: min(440px, 100%);
-      background: #111827;
-      border: 1px solid #334155;
-      border-radius: 18px;
-      padding: 18px;
-    }
+    .marker-list { display: flex; flex-direction: column; gap: 8px; }
+    .marker-item { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px; text-align: left; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+    .modal-box { width: min(440px, 100%); background: #111827; border: 1px solid #334155; border-radius: 18px; padding: 18px; }
     @media (max-width: 900px) {
-      .app {
-        grid-template-columns: 1fr;
-        grid-template-rows: 44vh 56vh;
-      }
-      .sidebar {
-        border-right: none;
-        border-bottom: 1px solid #243047;
-      }
+      .app { grid-template-columns: 1fr; grid-template-rows: 44vh 56vh; }
+      .sidebar { border-right: none; border-bottom: 1px solid #243047; }
+      .topbar { top: 8px; right: 8px; }
+      .topbar button { padding: 8px 10px; }
     }
   </style>
 </head>
@@ -201,7 +54,7 @@
   <div class="app">
     <aside class="sidebar">
       <div class="title">GTAV 私人地圖</div>
-      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記、手機和電腦都能拖曳與縮放。可本機保存，也可同步到 GitHub 的 <code>markers.json</code>。</div>
+      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記、手機和電腦都能拖曳與縮放。</div>
 
       <div class="card">
         <label>地圖樣式</label>
@@ -220,7 +73,6 @@
       <div class="card">
         <label>你的名字</label>
         <input id="playerName" placeholder="例如 BYwayJu" />
-
         <label>標記圖案</label>
         <select id="iconSelect" onchange="selectIcon(this.value)">
           <option value="🏠">🏠 房子</option>
@@ -268,54 +120,52 @@
 <option value="🧼">🧼 高壓清洗工</option>
 <option value="📍">📍 一般標記</option>
         </select>
-
         <div class="icon-grid">
-          <button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe0")" title="房子">🏠<span>房子</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc8e")" title="鑽石">💎<span>鑽石</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc1f")" title="魚">🐟<span>魚</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udcc4")" title="紙張">📄<span>紙張</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udcf1")" title="平板">📱<span>平板</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfed")" title="托車廠">🏭<span>托車廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\ude93")" title="伐木中心">🪓<span>伐木中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfa3")" title="漁業中心">🎣<span>漁業中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26cf\ufe0f")" title="礦業中心">⛏️<span>礦業中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udca0")" title="礦石清洗區">💠<span>礦石清洗區</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude9c")" title="農場管理員">🚜<span>農場管理員</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\ude9d")" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udeb5")" title="鋸木廠">🪵<span>鋸木廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udded")" title="導航點">🧭<span>導航點</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udea9")" title="AFTERLIFE'S TUNER">🚩<span>AFTERLIFE'S TUNER</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude97")" title="二手車商">🚗<span>二手車商</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\uddfa")" title="伐木工商店">🧺<span>伐木工商店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udd7f\ufe0f")" title="停車場">🅿️<span>停車場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26a1")" title="刺青店">⚡<span>刺青店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\uded2")" title="商店">🛒<span>商店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfdb\ufe0f")" title="市政廳">🏛️<span>市政廳</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udee0\ufe0f")" title="怪獸車廠">🛠️<span>怪獸車廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26ea")" title="教堂">⛪<span>教堂</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc55")" title="服飾店">👕<span>服飾店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd27")" title="機械師">🔧<span>機械師</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd2b")" title="武器商人">🔫<span>武器商人</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfb5")" title="沙威瑪店">🎵<span>沙威瑪店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfa3")" title="漁具店">🎣<span>漁具店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u2702\ufe0f")" title="理髮廳">✂️<span>理髮廳</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udf70")" title="甜點店">🍰<span>甜點店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udd6c")" title="生鮮市場">🥬<span>生鮮市場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd10")" title="監獄">🔐<span>監獄</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26cf\ufe0f")" title="礦業店">⛏️<span>礦業店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude99")" title="租車公司">🚙<span>租車公司</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\uddf0")" title="置物櫃">🧰<span>置物櫃</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udee1\ufe0f")" title="艾爾塔警局">🛡️<span>艾爾塔警局</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude95")" title="車輛經銷商">🚕<span>車輛經銷商</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe5")" title="醫院">🏥<span>醫院</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\uddf2")" title="金屬檢測店">🧲<span>金屬檢測店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26a1")" title="電力維修工">⚡<span>電力維修工</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u2708\ufe0f")" title="飛機扣押場">✈️<span>飛機扣押場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe8")" title="飯店">🏨<span>飯店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\uddfc")" title="高壓清洗工">🧼<span>高壓清洗工</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udccd")" title="一般標記">📍<span>一般標記</span></button>
+          <button type="button" class="icon-btn" onclick="selectIcon('🏠')" title="房子">🏠<span>房子</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('💎')" title="鑽石">💎<span>鑽石</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🐟')" title="魚">🐟<span>魚</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('📄')" title="紙張">📄<span>紙張</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('📱')" title="平板">📱<span>平板</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🏭')" title="托車廠">🏭<span>托車廠</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🪓')" title="伐木中心">🪓<span>伐木中心</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🎣')" title="漁業中心">🎣<span>漁業中心</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('⛏️')" title="礦業中心">⛏️<span>礦業中心</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('💠')" title="礦石清洗區">💠<span>礦石清洗區</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🚜')" title="農場管理員">🚜<span>農場管理員</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🪝')" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🪵')" title="鋸木廠">🪵<span>鋸木廠</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🧭')" title="導航點">🧭<span>導航點</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🚩')" title="AFTERLIFE'S TUNER">🚩<span>AFTERLIFE'S TUNER</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🚗')" title="二手車商">🚗<span>二手車商</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🧺')" title="伐木工商店">🧺<span>伐木工商店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🅿️')" title="停車場">🅿️<span>停車場</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('⚡')" title="刺青店">⚡<span>刺青店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🛒')" title="商店">🛒<span>商店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🏛️')" title="市政廳">🏛️<span>市政廳</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🛠️')" title="怪獸車廠">🛠️<span>怪獸車廠</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('⛪')" title="教堂">⛪<span>教堂</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('👕')" title="服飾店">👕<span>服飾店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🔧')" title="機械師">🔧<span>機械師</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🔫')" title="武器商人">🔫<span>武器商人</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🎵')" title="沙威瑪店">🎵<span>沙威瑪店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🎣')" title="漁具店">🎣<span>漁具店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('✂️')" title="理髮廳">✂️<span>理髮廳</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🍰')" title="甜點店">🍰<span>甜點店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🥬')" title="生鮮市場">🥬<span>生鮮市場</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🔐')" title="監獄">🔐<span>監獄</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('⛏️')" title="礦業店">⛏️<span>礦業店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🚙')" title="租車公司">🚙<span>租車公司</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🧰')" title="置物櫃">🧰<span>置物櫃</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🛡️')" title="艾爾塔警局">🛡️<span>艾爾塔警局</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🚕')" title="車輛經銷商">🚕<span>車輛經銷商</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🏥')" title="醫院">🏥<span>醫院</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🧲')" title="金屬檢測店">🧲<span>金屬檢測店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('⚡')" title="電力維修工">⚡<span>電力維修工</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('✈️')" title="飛機扣押場">✈️<span>飛機扣押場</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🏨')" title="飯店">🏨<span>飯店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('🧼')" title="高壓清洗工">🧼<span>高壓清洗工</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon('📍')" title="一般標記">📍<span>一般標記</span></button>
         </div>
-
         <label>自訂圖示（可留空）</label>
         <input id="customIcon" placeholder="例如 💰" />
         <div class="small">點地圖空白處即可新增標記。點既有標記可修改或刪除。</div>
@@ -325,7 +175,7 @@
         <label>GitHub 帳號</label>
         <input id="ghOwner" placeholder="例如 BYwayJu" />
         <label>Repo 名稱</label>
-        <input id="ghRepo" placeholder="例如 Gtavmap1" />
+        <input id="ghRepo" placeholder="例如 gtav-map" />
         <label>Branch</label>
         <input id="ghBranch" value="main" />
         <label>資料檔路徑</label>
@@ -346,7 +196,7 @@
     </aside>
 
     <main id="viewer" class="viewer">
-      <div class="topbar">
+      <div id="topbar" class="topbar">
         <button type="button" onclick="zoomBy(1.2)">＋</button>
         <button type="button" onclick="zoomBy(0.83)">－</button>
         <button type="button" onclick="resetView()">重置</button>
@@ -375,11 +225,11 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
-
     const viewer = $("viewer");
     const stage = $("stage");
     const mapImage = $("mapImage");
     const modal = $("markerModal");
+    const topbar = $("topbar");
 
     let activeMap = localStorage.getItem("gtav_active_map") || "map-atlas.png";
     let selectedIcon = localStorage.getItem("gtav_selected_icon") || "🏠";
@@ -390,8 +240,17 @@
 
     let viewState = { scale: 1, x: 0, y: 0 };
     let imgSize = { w: 1, h: 1 };
-    let dragInfo = { active: false, moved: false, x: 0, y: 0 };
+    let dragInfo = { active: false, moved: false, x: 0, y: 0, blocked: false };
     let pinchInfo = null;
+
+    /* 修正：右上角控制按鈕不要冒泡到地圖，避免按 + - 重置變新增標籤 */
+    ["click", "pointerdown", "pointerup", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
+      topbar.addEventListener(evt, (e) => e.stopPropagation(), { passive: false });
+    });
+
+    function isControlTarget(target) {
+      return !!target.closest("button, input, select, textarea, .topbar, .sidebar, .modal");
+    }
 
     function getMarkerBucket() {
       return allMarkers[activeMap] || [];
@@ -496,22 +355,27 @@
     }
 
     viewer.addEventListener("wheel", (e) => {
+      if (isControlTarget(e.target)) return;
       e.preventDefault();
       const rect = viewer.getBoundingClientRect();
       zoomAt(e.deltaY < 0 ? 1.12 : 0.89, e.clientX - rect.left, e.clientY - rect.top);
     }, { passive: false });
 
     viewer.addEventListener("pointerdown", (e) => {
-      if (e.target.closest(".marker")) return;
+      if (isControlTarget(e.target) || e.target.closest(".marker")) {
+        dragInfo.blocked = true;
+        return;
+      }
       viewer.setPointerCapture(e.pointerId);
       dragInfo.active = true;
+      dragInfo.blocked = false;
       dragInfo.moved = false;
       dragInfo.x = e.clientX;
       dragInfo.y = e.clientY;
     });
 
     viewer.addEventListener("pointermove", (e) => {
-      if (!dragInfo.active || pinchInfo) return;
+      if (!dragInfo.active || dragInfo.blocked || pinchInfo) return;
       const dx = e.clientX - dragInfo.x;
       const dy = e.clientY - dragInfo.y;
       if (Math.abs(dx) + Math.abs(dy) > 4) dragInfo.moved = true;
@@ -523,6 +387,11 @@
     });
 
     viewer.addEventListener("pointerup", (e) => {
+      if (dragInfo.blocked || isControlTarget(e.target) || e.target.closest(".marker")) {
+        dragInfo.active = false;
+        dragInfo.blocked = false;
+        return;
+      }
       if (!dragInfo.active) return;
       dragInfo.active = false;
       if (!dragInfo.moved && !pinchInfo) {
@@ -532,6 +401,7 @@
     });
 
     viewer.addEventListener("touchstart", (e) => {
+      if (isControlTarget(e.target)) return;
       if (e.touches.length === 2) {
         e.preventDefault();
         const [a, b] = e.touches;
@@ -579,6 +449,7 @@
         btn.style.left = (marker.xPct * imgSize.w / 100) + "px";
         btn.style.top = (marker.yPct * imgSize.h / 100) + "px";
         btn.innerHTML = `${marker.icon}<span class="marker-label">${escapeHtml(marker.name)}</span>`;
+        btn.title = marker.name;
         btn.addEventListener("click", (e) => {
           e.stopPropagation();
           openEditModal(marker.id);
@@ -627,9 +498,7 @@
         alert("請輸入名稱");
         return;
       }
-
       const markers = getMarkerBucket();
-
       if (editingMarkerId) {
         const marker = markers.find(x => x.id === editingMarkerId);
         if (!marker) return;
@@ -649,7 +518,6 @@
           createdAt: Date.now(),
         });
       }
-
       setMarkerBucket(markers);
       renderMarkers();
       closeModal();
@@ -693,10 +561,7 @@
         setStatus("GitHub 讀取中...", "warn");
         const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`;
         const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${cfg.token}`,
-            Accept: "application/vnd.github+json"
-          }
+          headers: { Authorization: `Bearer ${cfg.token}`, Accept: "application/vnd.github+json" }
         });
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
@@ -721,19 +586,11 @@
       try {
         setStatus("寫入 GitHub 中...", "warn");
         const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
-        const body = {
-          message,
-          content: b64encodeUtf8(JSON.stringify(allMarkers, null, 2)),
-          branch: cfg.branch
-        };
+        const body = { message, content: b64encodeUtf8(JSON.stringify(allMarkers, null, 2)), branch: cfg.branch };
         if (githubSha) body.sha = githubSha;
-
         const res = await fetch(url, {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${cfg.token}`,
-            Accept: "application/vnd.github+json"
-          },
+          headers: { Authorization: `Bearer ${cfg.token}`, Accept: "application/vnd.github+json" },
           body: JSON.stringify(body)
         });
         if (!res.ok) throw new Error(await res.text());
