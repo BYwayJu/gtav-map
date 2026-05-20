@@ -328,12 +328,13 @@
 
     function applyView() {
       stage.style.transform = `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`;
+      stage.style.setProperty("--marker-scale", String(1 / viewState.scale));
     }
 
     function zoomAt(factor, cx, cy) {
       const beforeX = (cx - viewState.x) / viewState.scale;
       const beforeY = (cy - viewState.y) / viewState.scale;
-      viewState.scale = Math.max(0.05, Math.min(12, viewState.scale * factor));
+      viewState.scale = Math.max(0.05, Math.min(6, viewState.scale * factor));
       viewState.x = cx - beforeX * viewState.scale;
       viewState.y = cy - beforeY * viewState.scale;
       applyView();
