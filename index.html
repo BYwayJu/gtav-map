@@ -168,7 +168,28 @@
         </div>
         <label>自訂圖示（可留空）</label>
         <input id="customIcon" placeholder="例如 💰" />
-        <div class="small">只在圖片本體內點擊才會新增標記；按住標記可拖曳移動；點標記可修改或刪除。</div>
+
+        <label>顯示分類</label>
+        <select id="filterIcon" onchange="setFilter(this.value)">
+          <option value="all">全部顯示</option>
+          <option value="🏠">🏠 房子</option>
+          <option value="💎">💎 鑽石</option>
+          <option value="🐟">🐟 魚</option>
+          <option value="📄">📄 紙張</option>
+          <option value="📱">📱 平板</option>
+          <option value="🏭">🏭 托車廠</option>
+          <option value="🚜">🚜 農場</option>
+          <option value="🎣">🎣 釣魚</option>
+          <option value="⛏️">⛏️ 礦業</option>
+          <option value="🪓">🪓 伐木</option>
+        </select>
+
+        <div class="row" style="margin-top:8px;">
+          <button type="button" id="modeBtn" onclick="toggleEditMode()">目前：編輯模式</button>
+          <button type="button" class="muted-btn" onclick="clearFilter()">顯示全部</button>
+        </div>
+
+        <div class="small">編輯模式：點地圖本體新增標記、按住標記拖曳移動、點標記可修改。觀看模式：不會誤新增。電腦右鍵或手機長按標記可刪除。</div>
       </div>
 
       <div class="card">
@@ -246,6 +267,12 @@
     let movingMarkerId = null;
     let movingMarkerMoved = false;
     let suppressNextMarkerClick = false;
+    let imageMaskCanvas = document.createElement("canvas");
+    let imageMaskCtx = imageMaskCanvas.getContext("2d", { willReadFrequently: true });
+    let bgColor = [0, 0, 0];
+    let editMode = localStorage.getItem("gtav_edit_mode") !== "view";
+    let activeFilter = localStorage.getItem("gtav_filter_icon") || "all";
+    let longPressTimer = null;
 
     /* 修正：右上角控制按鈕不要冒泡到地圖，避免按 + - 重置變新增標籤 */
     ["click", "pointerdown", "pointerup", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
@@ -308,6 +335,48 @@
       localStorage.setItem("gtav_selected_icon", selectedIcon);
     }
 
+    function toggleEditMode() {
+      editMode = !editMode;
+      localStorage.setItem("gtav_edit_mode", editMode ? "edit" : "view");
+      updateModeButton();
+    }
+
+    function updateModeButton() {
+      const btn = $("modeBtn");
+      if (!btn) return;
+      btn.textContent = editMode ? "目前：編輯模式" : "目前：觀看模式";
+      btn.classList.toggle("edit-mode", editMode);
+      btn.classList.toggle("view-mode", !editMode);
+    }
+
+    function setFilter(icon) {
+      activeFilter = icon || "all";
+      localStorage.setItem("gtav_filter_icon", activeFilter);
+      const sel = $("filterIcon");
+      if (sel) sel.value = activeFilter;
+      renderMarkers();
+    }
+
+    function clearFilter() {
+      setFilter("all");
+    }
+
+    function getVisibleMarkers() {
+      const markers = getMarkerBucket();
+      if (activeFilter === "all") return markers;
+      return markers.filter(m => m.icon === activeFilter);
+    }
+
+    function confirmDeleteMarker(id) {
+      const markers = getMarkerBucket();
+      const marker = markers.find(m => m.id === id);
+      if (!marker) return;
+      if (!confirm(`刪除標記「${marker.name}」？`)) return;
+      setMarkerBucket(markers.filter(m => m.id !== id));
+      renderMarkers();
+      pushToGithub("delete marker");
+    }
+
     function switchMap(mapName) {
       activeMap = mapName;
       $("mapSelect").value = mapName;
@@ -317,6 +386,28 @@
 
     mapImage.onload = () => {
       imgSize = { w: mapImage.naturalWidth, h: mapImage.naturalHeight };
+
+      // 建立像素遮罩：用四個角落的平均色作為「圖外背景色」參考
+      imageMaskCanvas.width = imgSize.w;
+      imageMaskCanvas.height = imgSize.h;
+      imageMaskCtx.clearRect(0, 0, imgSize.w, imgSize.h);
+      imageMaskCtx.drawImage(mapImage, 0, 0);
+
+      function sample(x, y) {
+        const d = imageMaskCtx.getImageData(Math.max(0, Math.min(imgSize.w - 1, x)), Math.max(0, Math.min(imgSize.h - 1, y)), 1, 1).data;
+        return [d[0], d[1], d[2], d[3]];
+      }
+
+      const p1 = sample(5, 5);
+      const p2 = sample(imgSize.w - 6, 5);
+      const p3 = sample(5, imgSize.h - 6);
+      const p4 = sample(imgSize.w - 6, imgSize.h - 6);
+      bgColor = [
+        Math.round((p1[0] + p2[0] + p3[0] + p4[0]) / 4),
+        Math.round((p1[1] + p2[1] + p3[1] + p4[1]) / 4),
+        Math.round((p1[2] + p2[2] + p3[2] + p4[2]) / 4),
+      ];
+
       resetView();
       renderMarkers();
     };
@@ -338,7 +429,7 @@
       // 地圖越放大：圖示才逐步變大
       // 但不會跟著地圖無限放大
       const zoomRatio = Math.max(0.01, viewState.scale / Math.max(baseScale, 0.01));
-      const desiredScreenScale = Math.max(0.22, Math.min(0.72, 0.26 * Math.sqrt(zoomRatio)));
+      const desiredScreenScale = Math.max(0.08, Math.min(0.26, 0.10 * Math.sqrt(zoomRatio)));
       stage.style.setProperty("--marker-scale", String(desiredScreenScale / viewState.scale));
     }
 
@@ -371,6 +462,29 @@
       const x = (clientX - rect.left - viewState.x) / viewState.scale;
       const y = (clientY - rect.top - viewState.y) / viewState.scale;
       return x >= 0 && x <= imgSize.w && y >= 0 && y <= imgSize.h;
+    }
+
+    function isPointAllowedForMarker(clientX, clientY) {
+      if (!isPointInsideImage(clientX, clientY)) return false;
+      const rect = viewer.getBoundingClientRect();
+      const x = Math.round((clientX - rect.left - viewState.x) / viewState.scale);
+      const y = Math.round((clientY - rect.top - viewState.y) / viewState.scale);
+
+      const d = imageMaskCtx.getImageData(
+        Math.max(0, Math.min(imgSize.w - 1, x)),
+        Math.max(0, Math.min(imgSize.h - 1, y)),
+        1, 1
+      ).data;
+
+      // 若點到的顏色非常接近圖片四角外圍背景色，視為「圖外 / 外圍海域 / 空白區」
+      const dist = Math.sqrt(
+        Math.pow(d[0] - bgColor[0], 2) +
+        Math.pow(d[1] - bgColor[1], 2) +
+        Math.pow(d[2] - bgColor[2], 2)
+      );
+
+      // 門檻可讓藍色外圍背景不能新增；地圖本體大多能正常新增
+      return dist > 38;
     }
 
     window.addEventListener("pointermove", (e) => {
@@ -439,8 +553,9 @@
       if (!dragInfo.active) return;
       dragInfo.active = false;
       if (!dragInfo.moved && !pinchInfo) {
-        // 只允許在圖片本體範圍內新增標記；點到旁邊空白背景不會新增
-        if (!isPointInsideImage(e.clientX, e.clientY)) return;
+        if (!editMode) return;
+        // 只允許在圖片本體、且不是外圍藍色背景的位置新增標記
+        if (!isPointAllowedForMarker(e.clientX, e.clientY)) return;
         pendingPoint = screenToImage(e.clientX, e.clientY);
         openCreateModal();
       }
@@ -487,7 +602,7 @@
 
     function renderMarkers() {
       stage.querySelectorAll(".marker").forEach(el => el.remove());
-      const markers = getMarkerBucket();
+      const markers = getVisibleMarkers();
 
       markers.forEach(marker => {
         const btn = document.createElement("button");
@@ -501,6 +616,7 @@
         btn.addEventListener("pointerdown", (e) => {
           e.stopPropagation();
           e.preventDefault();
+          if (!editMode) return;
           movingMarkerId = marker.id;
           movingMarkerMoved = false;
           suppressNextMarkerClick = false;
@@ -513,13 +629,40 @@
             suppressNextMarkerClick = false;
             return;
           }
-          openEditModal(marker.id);
+          if (editMode) openEditModal(marker.id);
         });
+
+        // 電腦右鍵刪除
+        btn.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (editMode) confirmDeleteMarker(marker.id);
+        });
+
+        // 手機長按刪除
+        btn.addEventListener("touchstart", (e) => {
+          if (!editMode) return;
+          longPressTimer = setTimeout(() => {
+            confirmDeleteMarker(marker.id);
+          }, 650);
+        }, { passive: true });
+
+        btn.addEventListener("touchmove", () => {
+          if (longPressTimer) clearTimeout(longPressTimer);
+        }, { passive: true });
+
+        btn.addEventListener("touchend", () => {
+          if (longPressTimer) clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }, { passive: true });
 
         stage.appendChild(btn);
       });
 
-      $("markerCount").textContent = `目前地圖共有 ${markers.length} 個標記`;
+      const totalCount = getMarkerBucket().length;
+      $("markerCount").textContent = activeFilter === "all"
+        ? `目前地圖共有 ${totalCount} 個標記`
+        : `目前顯示 ${markers.length} / ${totalCount} 個標記`;
       $("markerList").innerHTML = markers.map(marker => `
         <button type="button" class="marker-item" onclick="openEditModal('${marker.id}')">
           <div><strong>${marker.icon} ${escapeHtml(marker.name)}</strong></div>
@@ -669,6 +812,9 @@
 
     loadLocalData();
     loadSettings();
+    updateModeButton();
+    const filterSelect = $("filterIcon");
+    if (filterSelect) filterSelect.value = activeFilter;
     selectIcon(selectedIcon);
     switchMap(activeMap);
   </script>
