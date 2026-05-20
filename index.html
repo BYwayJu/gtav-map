@@ -168,7 +168,7 @@
         </div>
         <label>自訂圖示（可留空）</label>
         <input id="customIcon" placeholder="例如 💰" />
-        <div class="small">點地圖空白處即可新增標記。點既有標記可修改或刪除。</div>
+        <div class="small">點地圖空白處新增標記；按住標記可拖曳移動；點標記可修改或刪除。</div>
       </div>
 
       <div class="card">
@@ -240,8 +240,12 @@
 
     let viewState = { scale: 1, x: 0, y: 0 };
     let imgSize = { w: 1, h: 1 };
+    let baseScale = 1;
     let dragInfo = { active: false, moved: false, x: 0, y: 0, blocked: false };
     let pinchInfo = null;
+    let movingMarkerId = null;
+    let movingMarkerMoved = false;
+    let suppressNextMarkerClick = false;
 
     /* 修正：右上角控制按鈕不要冒泡到地圖，避免按 + - 重置變新增標籤 */
     ["click", "pointerdown", "pointerup", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
@@ -321,6 +325,7 @@
       const rect = viewer.getBoundingClientRect();
       const scale = Math.min(rect.width / imgSize.w, rect.height / imgSize.h) * 0.94;
       viewState.scale = scale;
+      baseScale = scale;
       viewState.x = (rect.width - imgSize.w * scale) / 2;
       viewState.y = (rect.height - imgSize.h * scale) / 2;
       applyView();
@@ -328,7 +333,13 @@
 
     function applyView() {
       stage.style.transform = `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`;
-      stage.style.setProperty("--marker-scale", String(1 / viewState.scale));
+      // 標記大小規則：
+      // 地圖縮小/初始時：圖示很小
+      // 地圖越放大：圖示才逐步變大
+      // 但不會跟著地圖無限放大
+      const zoomRatio = Math.max(0.01, viewState.scale / Math.max(baseScale, 0.01));
+      const desiredScreenScale = Math.max(0.38, Math.min(1.15, 0.42 * Math.sqrt(zoomRatio)));
+      stage.style.setProperty("--marker-scale", String(desiredScreenScale / viewState.scale));
     }
 
     function zoomAt(factor, cx, cy) {
@@ -355,6 +366,31 @@
       };
     }
 
+    window.addEventListener("pointermove", (e) => {
+      if (!movingMarkerId) return;
+      e.preventDefault();
+      movingMarkerMoved = true;
+      const point = screenToImage(e.clientX, e.clientY);
+      const markers = getMarkerBucket();
+      const marker = markers.find(x => x.id === movingMarkerId);
+      if (!marker) return;
+      marker.xPct = point.xPct;
+      marker.yPct = point.yPct;
+      setMarkerBucket(markers);
+      renderMarkers();
+    }, { passive: false });
+
+    window.addEventListener("pointerup", () => {
+      if (!movingMarkerId) return;
+      if (movingMarkerMoved) {
+        suppressNextMarkerClick = true;
+        pushToGithub("move marker");
+      }
+      movingMarkerId = null;
+      movingMarkerMoved = false;
+      setTimeout(() => { suppressNextMarkerClick = false; }, 80);
+    });
+
     viewer.addEventListener("wheel", (e) => {
       if (isControlTarget(e.target)) return;
       e.preventDefault();
@@ -363,7 +399,7 @@
     }, { passive: false });
 
     viewer.addEventListener("pointerdown", (e) => {
-      if (isControlTarget(e.target) || e.target.closest(".marker")) {
+      if (isControlTarget(e.target) || e.target.closest(".marker") || movingMarkerId) {
         dragInfo.blocked = true;
         return;
       }
@@ -451,10 +487,26 @@
         btn.style.top = (marker.yPct * imgSize.h / 100) + "px";
         btn.innerHTML = `${marker.icon}<span class="marker-label">${escapeHtml(marker.name)}</span>`;
         btn.title = marker.name;
+
+        // 拖曳標記：按住標記移動，放開後自動儲存位置
+        btn.addEventListener("pointerdown", (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          movingMarkerId = marker.id;
+          movingMarkerMoved = false;
+          suppressNextMarkerClick = false;
+          btn.setPointerCapture(e.pointerId);
+        });
+
         btn.addEventListener("click", (e) => {
           e.stopPropagation();
+          if (suppressNextMarkerClick) {
+            suppressNextMarkerClick = false;
+            return;
+          }
           openEditModal(marker.id);
         });
+
         stage.appendChild(btn);
       });
 
