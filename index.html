@@ -168,7 +168,7 @@
         </div>
         <label>自訂圖示（可留空）</label>
         <input id="customIcon" placeholder="例如 💰" />
-        <div class="small">點地圖空白處新增標記；按住標記可拖曳移動；點標記可修改或刪除。</div>
+        <div class="small">只在圖片本體內點擊才會新增標記；按住標記可拖曳移動；點標記可修改或刪除。</div>
       </div>
 
       <div class="card">
@@ -338,7 +338,7 @@
       // 地圖越放大：圖示才逐步變大
       // 但不會跟著地圖無限放大
       const zoomRatio = Math.max(0.01, viewState.scale / Math.max(baseScale, 0.01));
-      const desiredScreenScale = Math.max(0.38, Math.min(1.15, 0.42 * Math.sqrt(zoomRatio)));
+      const desiredScreenScale = Math.max(0.22, Math.min(0.72, 0.26 * Math.sqrt(zoomRatio)));
       stage.style.setProperty("--marker-scale", String(desiredScreenScale / viewState.scale));
     }
 
@@ -364,6 +364,13 @@
         xPct: Math.max(0, Math.min(100, (x / imgSize.w) * 100)),
         yPct: Math.max(0, Math.min(100, (y / imgSize.h) * 100)),
       };
+    }
+
+    function isPointInsideImage(clientX, clientY) {
+      const rect = viewer.getBoundingClientRect();
+      const x = (clientX - rect.left - viewState.x) / viewState.scale;
+      const y = (clientY - rect.top - viewState.y) / viewState.scale;
+      return x >= 0 && x <= imgSize.w && y >= 0 && y <= imgSize.h;
     }
 
     window.addEventListener("pointermove", (e) => {
@@ -432,6 +439,8 @@
       if (!dragInfo.active) return;
       dragInfo.active = false;
       if (!dragInfo.moved && !pinchInfo) {
+        // 只允許在圖片本體範圍內新增標記；點到旁邊空白背景不會新增
+        if (!isPointInsideImage(e.clientX, e.clientY)) return;
         pendingPoint = screenToImage(e.clientX, e.clientY);
         openCreateModal();
       }
