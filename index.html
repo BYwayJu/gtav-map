@@ -209,6 +209,23 @@
         <div id="syncStatus" class="small status-warn" style="margin-top:8px;">必須登入 GitHub Token 才能讀取/標記</div>
       </div>
 
+        <div class="card" style="margin-top:10px;">
+          <b>如何取得 GitHub Token？</b>
+          <ol class="small" style="padding-left:18px; line-height:1.7;">
+            <li>打開 GitHub，點右上角頭像。</li>
+            <li>進入 <b>Settings</b>。</li>
+            <li>左側滑到最下面，點 <b>Developer settings</b>。</li>
+            <li>點 <b>Personal access tokens</b>。</li>
+            <li>選 <b>Fine-grained tokens</b>。</li>
+            <li>點 <b>Generate new token</b>。</li>
+            <li><b>Repository access</b> 選 <b>Only select repositories</b>，選這個專案 <b>gtav-map</b>。</li>
+            <li><b>Repository permissions</b> 裡把 <b>Contents</b> 設成 <b>Read and write</b>。</li>
+            <li>產生後複製 <b>github_pat_</b> 開頭的 Token，貼到上面的欄位。</li>
+          </ol>
+          <div class="small status-warn">Token 只會顯示一次。不要公開給陌生人；朋友要修改標記，請讓朋友用自己的 GitHub 帳號產生 Token。</div>
+        </div>
+
+
       <div class="card">
         <div id="markerCount" class="small">共 0 個標記</div>
         <div id="markerList" class="marker-list" style="margin-top:8px;"></div>
