@@ -225,7 +225,7 @@
       <div id="stage">
         <img id="mapImage" alt="map" draggable="false" />
       </div>
-      <div class="hint">手機：單指拖曳、雙指縮放｜電腦：拖曳、滾輪縮放</div>
+      <div class="hint">手機：單指拖曳、雙指縮放｜縮放不會飛出畫面｜電腦：拖曳、滾輪縮放</div>
     </main>
   </div>
 
@@ -423,7 +423,27 @@
       applyView();
     }
 
+    function clampView() {
+      const rect = viewer.getBoundingClientRect();
+      const scaledW = imgSize.w * viewState.scale;
+      const scaledH = imgSize.h * viewState.scale;
+
+      // 若圖片比視窗小，保持置中；若圖片比視窗大，避免整張被拖/縮到視窗外完全不見
+      if (scaledW <= rect.width) {
+        viewState.x = (rect.width - scaledW) / 2;
+      } else {
+        viewState.x = Math.min(60, Math.max(rect.width - scaledW - 60, viewState.x));
+      }
+
+      if (scaledH <= rect.height) {
+        viewState.y = (rect.height - scaledH) / 2;
+      } else {
+        viewState.y = Math.min(60, Math.max(rect.height - scaledH - 60, viewState.y));
+      }
+    }
+
     function applyView() {
+      clampView();
       stage.style.transform = `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`;
       // 標記大小規則：
       // 地圖縮小/初始時：圖示很小
@@ -437,7 +457,7 @@
     function zoomAt(factor, cx, cy) {
       const beforeX = (cx - viewState.x) / viewState.scale;
       const beforeY = (cy - viewState.y) / viewState.scale;
-      viewState.scale = Math.max(0.05, Math.min(6, viewState.scale * factor));
+      viewState.scale = Math.max(baseScale * 0.65, Math.min(baseScale * 8, viewState.scale * factor));
       viewState.x = cx - beforeX * viewState.scale;
       viewState.y = cy - beforeY * viewState.scale;
       applyView();
@@ -553,7 +573,7 @@
       }
       if (!dragInfo.active) return;
       dragInfo.active = false;
-      if (!dragInfo.moved && !pinchInfo) {
+      if (!dragInfo.moved && !pinchInfo && !dragInfo.blocked) {
         if (!editMode) return;
         const player = $("playerName").value.trim();
         if (!player) {
@@ -572,10 +592,21 @@
       if (isControlTarget(e.target)) return;
       if (e.touches.length === 2) {
         e.preventDefault();
+        dragInfo.active = false;
+        dragInfo.blocked = true;
+
         const [a, b] = e.touches;
+        const rect = viewer.getBoundingClientRect();
+        const cx = ((a.clientX + b.clientX) / 2) - rect.left;
+        const cy = ((a.clientY + b.clientY) / 2) - rect.top;
+
         pinchInfo = {
-          dist: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY),
+          dist: Math.max(1, Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)),
           scale: viewState.scale,
+          centerX: cx,
+          centerY: cy,
+          imageX: (cx - viewState.x) / viewState.scale,
+          imageY: (cy - viewState.y) / viewState.scale
         };
       }
     }, { passive: false });
@@ -584,17 +615,24 @@
       if (e.touches.length === 2 && pinchInfo) {
         e.preventDefault();
         const [a, b] = e.touches;
-        const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
         const rect = viewer.getBoundingClientRect();
+        const dist = Math.max(1, Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY));
         const cx = ((a.clientX + b.clientX) / 2) - rect.left;
         const cy = ((a.clientY + b.clientY) / 2) - rect.top;
-        viewState.scale = pinchInfo.scale;
-        zoomAt(dist / pinchInfo.dist, cx, cy);
+
+        const nextScale = pinchInfo.scale * (dist / pinchInfo.dist);
+        viewState.scale = Math.max(baseScale * 0.65, Math.min(baseScale * 8, nextScale));
+
+        // 用雙指中心對準原本圖片座標，避免縮放時圖片瞬間飛走/消失
+        viewState.x = cx - pinchInfo.imageX * viewState.scale;
+        viewState.y = cy - pinchInfo.imageY * viewState.scale;
+        applyView();
       }
     }, { passive: false });
 
     viewer.addEventListener("touchend", () => {
       pinchInfo = null;
+      dragInfo.blocked = false;
     });
 
     function escapeHtml(text) {
