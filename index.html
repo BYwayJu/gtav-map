@@ -48,6 +48,81 @@
       .topbar { top: 8px; right: 8px; }
       .topbar button { padding: 8px 10px; }
     }
+  
+    /* 可讀性加強：左側文字全部放大 */
+    .sidebar {
+      font-size: 17px;
+    }
+    .sidebar label {
+      font-size: 17px !important;
+      font-weight: 700;
+    }
+    .sidebar input,
+    .sidebar select,
+    .sidebar textarea,
+    .sidebar button {
+      font-size: 17px !important;
+      padding: 12px 14px !important;
+    }
+    .sidebar .small {
+      font-size: 15px !important;
+      line-height: 1.75 !important;
+    }
+    .sidebar .card b {
+      font-size: 18px;
+    }
+    .sidebar .title {
+      font-size: 30px !important;
+    }
+    .sidebar .subtitle {
+      font-size: 15px !important;
+      line-height: 1.7 !important;
+    }
+    .icon-btn span {
+      font-size: 13px !important;
+    }
+
+    /* 標記資訊：上方顯示輸入內容，下方顯示誰標記 */
+    .marker-label {
+      text-align: center;
+      line-height: 1.25;
+      min-width: max-content;
+    }
+    .marker-label .marker-name {
+      display: block;
+      font-weight: 800;
+      font-size: 12px;
+      color: #ffffff;
+    }
+    .marker-label .marker-owner {
+      display: block;
+      font-size: 10px;
+      color: #facc15;
+      margin-top: 1px;
+    }
+
+    @media(max-width:850px){
+      .sidebar {
+        font-size: 16px;
+      }
+      .sidebar label {
+        font-size: 16px !important;
+      }
+      .sidebar input,
+      .sidebar select,
+      .sidebar textarea,
+      .sidebar button {
+        font-size: 16px !important;
+        padding: 12px 14px !important;
+      }
+      .sidebar .small {
+        font-size: 14px !important;
+      }
+      .icon-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -702,7 +777,7 @@
         btn.className = "marker";
         btn.style.left = (marker.xPct * imgSize.w / 100) + "px";
         btn.style.top = (marker.yPct * imgSize.h / 100) + "px";
-        btn.innerHTML = `${marker.icon}<span class="marker-label">${escapeHtml(marker.name)}｜${escapeHtml(marker.owner || "未命名")}</span>`;
+        btn.innerHTML = `${marker.icon}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner || "未命名")}</span></span>`;
         btn.title = marker.name;
 
         // 拖曳標記：按住標記移動，放開後自動儲存位置
@@ -760,7 +835,7 @@
       $("markerList").innerHTML = markers.map(marker => `
         <button type="button" class="marker-item" onclick="openEditModal('${marker.id}')">
           <div><strong>${marker.icon} ${escapeHtml(marker.name)}</strong></div>
-          <div class="small">建立者：${escapeHtml(marker.owner || "未命名")}${marker.note ? "｜" + escapeHtml(marker.note) : ""}</div>
+          <div class="small">標記者：${escapeHtml(marker.owner || "未命名")}${marker.note ? "｜" + escapeHtml(marker.note) : ""}</div>
         </button>
       `).join("");
     }
@@ -772,7 +847,7 @@
       $("markerNote").value = "";
       $("deleteBtn").style.display = "none";
       const ownerInfo = $("markerOwnerInfo");
-      if (ownerInfo) ownerInfo.textContent = "建立者：將使用左側填寫的名字";
+      if (ownerInfo) ownerInfo.textContent = "標記者：將使用左側填寫的名字";
       modal.style.display = "flex";
     }
 
@@ -784,7 +859,7 @@
       $("markerName").value = marker.name;
       $("markerNote").value = marker.note || "";
       const ownerInfo = $("markerOwnerInfo");
-      if (ownerInfo) ownerInfo.textContent = "建立者：" + (marker.owner || "未命名");
+      if (ownerInfo) ownerInfo.textContent = "標記者：" + (marker.owner || "未命名");
       $("deleteBtn").style.display = "block";
       modal.style.display = "flex";
     }
