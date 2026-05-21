@@ -34,12 +34,56 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 .hint{position:absolute;left:12px;bottom:12px;z-index:10;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #stage img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
-.marker{position:absolute;transform:translate(-50%,-100%) scale(var(--marker-scale,1));transform-origin:center bottom;background:transparent;border:none;padding:0;cursor:grab;font-size:18px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));width:auto;touch-action:none}
+.marker{
+  position:absolute;
+  transform:translate(-50%,-50%) scale(var(--marker-scale,1));
+  transform-origin:center center;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:grab;
+  line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.95));
+  width:auto;
+  min-width:24px;
+  min-height:24px;
+  touch-action:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 .marker:active{cursor:grabbing}
-.marker-label{display:none;margin-top:2px;white-space:nowrap;border-radius:10px;background:rgba(15,23,42,.92);border:1px solid #334155;padding:4px 8px;transform:translateX(-32%);text-align:center;line-height:1.25}
+.marker-label{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:100%;
+  margin-top:5px;
+  white-space:nowrap;
+  border-radius:6px;
+  background:rgba(0,0,0,.82);
+  border:1px solid rgba(255,255,255,.16);
+  padding:4px 7px;
+  transform:translateX(-50%);
+  text-align:center;
+  line-height:1.25;
+  z-index:999;
+  box-shadow:0 2px 6px rgba(0,0,0,.55);
+}
 .marker:hover .marker-label,.marker:focus .marker-label{display:block}
-.marker-name{display:block;font-weight:800;font-size:12px;color:#fff}
-.marker-owner{display:block;font-size:10px;color:#facc15;margin-top:1px}
+.marker-name{
+  display:block;
+  font-weight:800;
+  font-size:13px;
+  color:#fff;
+}
+.marker-owner{
+  display:block;
+  font-size:11px;
+  color:#facc15;
+  margin-top:1px;
+  font-weight:700;
+}
 .marker-list{display:flex;flex-direction:column;gap:8px}
 .marker-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;text-align:left}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
@@ -71,17 +115,32 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   vertical-align:middle;
 }
 .marker .svg-icon{
-  width:30px;
-  height:30px;
+  width:28px;
+  height:28px;
   display:block;
 }
 .icon-btn .svg-icon{
-  width:30px;
-  height:30px;
+  width:32px;
+  height:32px;
   margin-bottom:4px;
 }
 .marker{
-  image-rendering:auto;
+  position:absolute;
+  transform:translate(-50%,-50%) scale(var(--marker-scale,1));
+  transform-origin:center center;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:grab;
+  line-height:1;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.95));
+  width:auto;
+  min-width:24px;
+  min-height:24px;
+  touch-action:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 </style>
@@ -164,7 +223,7 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
     <button type="button" onclick="resetView()">重置</button>
   </div>
   <div id="stage"><img id="mapImage" alt="map" draggable="false"></div>
-  <div class="hint">滿版地圖｜手機：單指拖曳、雙指縮放｜電腦：拖曳、滾輪縮放</div>
+  <div class="hint">GTA風格圖示｜縮放時圖示維持固定大小｜手機：單指拖曳、雙指縮放</div>
 </main>
 </div>
 
@@ -242,8 +301,8 @@ function iconMarkup(icon){
   const color = item[0];
   const path = item[1];
   return `<svg class="svg-icon" viewBox="0 0 32 32" aria-hidden="true">
-    <circle cx="16" cy="16" r="15" fill="white" stroke="black" stroke-width="2"/>
-    <path d="${path}" fill="${color}" stroke="black" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="16" cy="16" r="15" fill="white" stroke="black" stroke-width="2.1"/>
+    <path d="${path}" fill="${color}" stroke="black" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
   </svg>`;
 }
 
@@ -285,7 +344,7 @@ function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=n
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
-function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.34,Math.min(.85,.42*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds = 0.70; stage.style.setProperty("--marker-scale", String(ds / viewState.scale))}
 function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
