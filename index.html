@@ -145,6 +145,15 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 }
 .icon-btn:active,.iconBtn:active{transform:scale(.97)}
 
+
+/* group icon picker fix */
+.icon-btn.active,.iconBtn.active{
+  outline:3px solid #22d3ee!important;
+  background:#0e7490!important;
+  box-shadow:0 0 0 3px rgba(34,211,238,.25)!important;
+}
+.icon-btn:active,.iconBtn:active{transform:scale(.97)}
+
 </style>
 </head>
 <body>
@@ -170,59 +179,21 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   <div class="card">
     <label>你的名字（會顯示誰標記）</label>
     <input id="playerName" placeholder="例如 BYWAY" />
-    <label>標記圖案</label>
-    <select id="iconSelect" onchange="selectIcon(this.value)">
-      <option value="🏠">🏠 房子</option>
-<option value="💎">💎 鑽石</option>
-<option value="🐟">🐟 魚</option>
-<option value="📄">📄 紙張</option>
-<option value="📱">📱 平板</option>
-<option value="🏭">🏭 托車廠</option>
-<option value="🪓">🪓 伐木中心</option>
-<option value="🎣">🎣 漁業中心</option>
-<option value="⛏️">⛏️ 礦業中心</option>
-<option value="💠">💠 礦石清洗區</option>
-<option value="🚜">🚜 農場管理員</option>
-<option value="🪝">🪝 釣魚佈告欄</option>
-<option value="🪵">🪵 鋸木廠</option>
-<option value="🧭">🧭 導航點</option>
-<option value="🚗">🚗 二手車商</option>
-<option value="🅿️">🅿️ 停車場</option>
-<option value="🛒">🛒 商店</option>
-<option value="🏥">🏥 醫院</option>
-<option value="🛡️">🛡️ 警局</option>
-<option value="🔧">🔧 機械師</option>
-<option value="🔫">🔫 武器商人</option>
-<option value="⚡">⚡ 電力維修工</option>
-<option value="🏨">🏨 飯店</option>
-<option value="📍">📍 一般標記</option>
+    <label>標記圖案系列</label>
+    <select id="iconGroupSelect" onchange="renderIconGroup(this.value)">
+      
+<option value="work">工作 / 產業</option>
+<option value="fish">漁業 / 釣魚</option>
+<option value="shop">商店 / 服務</option>
+<option value="public">公共設施</option>
+<option value="crime">特殊 / 犯罪</option>
+<option value="custom">常用 / 自訂</option>
+
     </select>
-    <div class="small warn">可用上方選單選圖案，也可以直接點下面圖案；兩種都會切換目前標記圖示。</div>
-    <div class="icon-grid"><button type="button" class="icon-btn" data-icon="\ud83c\udfe0" onclick="selectIcon("\ud83c\udfe0")" title="房子">🏠<span>房子</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udc8e" onclick="selectIcon("\ud83d\udc8e")" title="鑽石">💎<span>鑽石</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udc1f" onclick="selectIcon("\ud83d\udc1f")" title="魚">🐟<span>魚</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udcc4" onclick="selectIcon("\ud83d\udcc4")" title="紙張">📄<span>紙張</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udcf1" onclick="selectIcon("\ud83d\udcf1")" title="平板">📱<span>平板</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83c\udfed" onclick="selectIcon("\ud83c\udfed")" title="托車廠">🏭<span>托車廠</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83e\ude93" onclick="selectIcon("\ud83e\ude93")" title="伐木中心">🪓<span>伐木中心</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83c\udfa3" onclick="selectIcon("\ud83c\udfa3")" title="漁業中心">🎣<span>漁業中心</span></button>
-<button type="button" class="icon-btn" data-icon="\u26cf\ufe0f" onclick="selectIcon("\u26cf\ufe0f")" title="礦業中心">⛏️<span>礦業中心</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udca0" onclick="selectIcon("\ud83d\udca0")" title="礦石清洗區">💠<span>礦石清洗區</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\ude9c" onclick="selectIcon("\ud83d\ude9c")" title="農場管理員">🚜<span>農場管理員</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83e\ude9d" onclick="selectIcon("\ud83e\ude9d")" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83e\udeb5" onclick="selectIcon("\ud83e\udeb5")" title="鋸木廠">🪵<span>鋸木廠</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83e\udded" onclick="selectIcon("\ud83e\udded")" title="導航點">🧭<span>導航點</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\ude97" onclick="selectIcon("\ud83d\ude97")" title="二手車商">🚗<span>二手車商</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83c\udd7f\ufe0f" onclick="selectIcon("\ud83c\udd7f\ufe0f")" title="停車場">🅿️<span>停車場</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\uded2" onclick="selectIcon("\ud83d\uded2")" title="商店">🛒<span>商店</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83c\udfe5" onclick="selectIcon("\ud83c\udfe5")" title="醫院">🏥<span>醫院</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udee1\ufe0f" onclick="selectIcon("\ud83d\udee1\ufe0f")" title="警局">🛡️<span>警局</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udd27" onclick="selectIcon("\ud83d\udd27")" title="機械師">🔧<span>機械師</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udd2b" onclick="selectIcon("\ud83d\udd2b")" title="武器商人">🔫<span>武器商人</span></button>
-<button type="button" class="icon-btn" data-icon="\u26a1" onclick="selectIcon("\u26a1")" title="電力維修工">⚡<span>電力維修工</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83c\udfe8" onclick="selectIcon("\ud83c\udfe8")" title="飯店">🏨<span>飯店</span></button>
-<button type="button" class="icon-btn" data-icon="\ud83d\udccd" onclick="selectIcon("\ud83d\udccd")" title="一般標記">📍<span>一般標記</span></button></div>
-    <label>自訂圖示（可留空）</label>
+    <div class="small warn">上方選單是「圖案系列」；下面會顯示該系列圖案。直接點下面圖案即可切換目前標記圖示。</div>
+    <div id="iconGrid" class="icon-grid"></div>
+
+<label>自訂圖示（可留空）</label>
     <input id="customIcon" placeholder="例如 💰" />
     <div class="small">點地圖新增標記；按住標記可拖曳移動；點標記可編輯。</div>
   </div>
@@ -305,20 +276,43 @@ function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMa
 function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
 function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
 function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null&&$("playerName"))$("playerName").value=n;if(t!==null&&$("ghToken"))$("ghToken").value=t}
-function selectIcon(icon){
-  selectedIcon = icon;
+const ICON_GROUPS = {"work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🧼", "高壓清洗工"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"], ["🛒", "漁具店"]], "shop": [["🛒", "商店"], ["🧺", "伐木工商店"], ["🚗", "二手車商"], ["🚕", "車輛經銷商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"], ["💗", "甜點店"], ["✂️", "理髮廳"], ["👕", "服飾店"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"]], "crime": [["🔫", "武器商人"], ["🚩", "AFTERLIFE'S TUNER"], ["🛠️", "怪獸車廠"], ["✈️", "飛機扣押場"], ["🧰", "置物櫃"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["💰", "錢袋"], ["⭐", "自訂"]]};
+function renderIconGroup(groupName){
+  localStorage.setItem('gtav_icon_group', groupName);
+  const groupSelect = $('iconGroupSelect');
+  if (groupSelect) groupSelect.value = groupName;
+  const group = ICON_GROUPS[groupName] || ICON_GROUPS.work;
+  const grid = $("iconGrid");
+  if (!grid) return;
 
-  const sel = $("iconSelect");
-  if (sel) sel.value = icon;
+  grid.innerHTML = group.map(([icon, name]) => `
+    <button type="button" class="icon-btn" data-icon="${icon}" onclick="selectIcon('${icon}')" title="${name}">
+      ${icon}<span>${name}</span>
+    </button>
+  `).join("");
+
+  const hasSelected = group.some(([icon]) => icon === selectedIcon);
+  if (!hasSelected && group.length) {
+    selectedIcon = group[0][0];
+    localStorage.setItem("gtav_selected_icon", selectedIcon);
+  }
+  selectIcon(selectedIcon, false);
+}
+
+function selectIcon(icon, showStatus = true){
+  selectedIcon = icon;
 
   document.querySelectorAll(".icon-btn,.iconBtn").forEach(btn => {
     const btnIcon = btn.getAttribute("data-icon") || "";
-    btn.classList.toggle("active", btnIcon === icon || btn.textContent.includes(icon));
+    btn.classList.toggle("active", btnIcon === icon);
   });
 
   localStorage.setItem("gtav_selected_icon", icon);
-  setStatus("目前選擇圖案：" + icon + "，點地圖即可新增這個圖標。", "ok");
+  if (showStatus) {
+    setStatus("目前選擇圖案：" + icon + "，點地圖即可新增這個圖標。", "ok");
+  }
 }
+
 function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
@@ -350,7 +344,7 @@ function b64decodeUtf8(str){return decodeURIComponent(escape(atob(str)))}
 async function loadPublicMarkers(confirmOverwrite=false){try{if(confirmOverwrite&&Object.values(allMarkers).some(a=>Array.isArray(a)&&a.length>0)&&!confirm("重新讀取會覆蓋你目前本機標記，確定？"))return;setStatus("讀取公開標記中...","warn");const res=await fetch(`markers.json?v=${Date.now()}`,{cache:"no-store"});if(!res.ok)throw new Error(await res.text());const text=await res.text();const parsed=text.trim()?JSON.parse(text):{};allMarkers=Array.isArray(parsed)?{[activeMap]:parsed}:(parsed||{});saveLocalData();renderMarkers();setStatus("已讀取公開標記；你可以本機編輯，公開請按「上傳同步」。","ok")}catch(e){console.error(e);setStatus("讀取公開標記失敗；保留目前本機標記。","bad")}}
 async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳同步失敗；本機標記仍保留。請確認 Token 有 Contents Read and write 權限。","bad");alert("上傳同步失敗：請確認 Token 有 Contents Read and write 權限。平常新增/移動/刪除仍會保留在本機。")}}
 window.addEventListener("resize",resetView);
-loadLocalData();loadSettings();selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
+loadLocalData();loadSettings();renderIconGroup(localStorage.getItem('gtav_icon_group') || 'work');switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
 </script>
 </body>
 </html>
