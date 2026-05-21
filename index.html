@@ -54,7 +54,7 @@
   <div class="app">
     <aside class="sidebar">
       <div class="title">GTAV 私人地圖</div>
-      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記、手機和電腦都能拖曳與縮放。</div>
+      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記。此版本不使用本機標記，必須填 GitHub Token 才能讀取與儲存。</div>
 
       <div class="card">
         <label>地圖樣式</label>
@@ -202,12 +202,12 @@
         <label>資料檔路徑</label>
         <input id="ghPath" value="markers.json" />
         <label>GitHub Token（可不填）</label>
-        <input id="ghToken" type="password" placeholder="有同步需求再填" />
+        <input id="ghToken" type="password" placeholder="必填：GitHub Token" />
         <div class="row" style="margin-top:8px;">
           <button type="button" onclick="saveSettings()">儲存設定</button>
           <button type="button" class="muted-btn" onclick="loadFromGithub()">讀取 GitHub</button>
         </div>
-        <div id="syncStatus" class="small status-warn" style="margin-top:8px;">目前使用本機儲存</div>
+        <div id="syncStatus" class="small status-warn" style="margin-top:8px;">必須登入 GitHub Token 才能讀取/標記</div>
       </div>
 
       <div class="card">
@@ -225,7 +225,7 @@
       <div id="stage">
         <img id="mapImage" alt="map" draggable="false" />
       </div>
-      <div class="hint">手機：單指拖曳、雙指縮放｜縮放不會飛出畫面｜電腦：拖曳、滾輪縮放</div>
+      <div class="hint">滿版地圖｜滿版地圖｜手機：單指拖曳、雙指縮放｜電腦：拖曳、滾輪縮放</div>
     </main>
   </div>
 
@@ -294,17 +294,13 @@
     }
 
     function saveLocalData() {
-      localStorage.setItem("gtav_markers", JSON.stringify(allMarkers));
+      // 不使用本機標記資料；所有標記都必須從 GitHub markers.json 讀寫
       localStorage.setItem("gtav_active_map", activeMap);
       localStorage.setItem("gtav_selected_icon", selectedIcon);
     }
 
     function loadLocalData() {
-      try {
-        allMarkers = JSON.parse(localStorage.getItem("gtav_markers") || "{}");
-      } catch (e) {
-        allMarkers = {};
-      }
+      allMarkers = {};
     }
 
     function saveSettings() {
@@ -415,7 +411,11 @@
 
     function resetView() {
       const rect = viewer.getBoundingClientRect();
-      const scale = Math.min(rect.width / imgSize.w, rect.height / imgSize.h) * 0.94;
+
+      // 滿版模式：用 cover 而不是 contain
+      // 會讓地圖填滿整個畫面，不留左右/上下空白；多出來的部分會在畫面外，可拖曳查看。
+      const scale = Math.max(rect.width / imgSize.w, rect.height / imgSize.h);
+
       viewState.scale = scale;
       baseScale = scale;
       viewState.x = (rect.width - imgSize.w * scale) / 2;
@@ -575,6 +575,11 @@
       dragInfo.active = false;
       if (!dragInfo.moved && !pinchInfo && !dragInfo.blocked) {
         if (!editMode) return;
+        const cfg = getGithubConfig();
+        if (!cfg.owner || !cfg.repo || !cfg.token) {
+          alert("請先填 GitHub 帳號、Repo、Token，並按「讀取 GitHub」登入後才能標記。");
+          return;
+        }
         const player = $("playerName").value.trim();
         if (!player) {
           alert("請先在左側填寫你的名字，才可以新增標記。");
@@ -760,6 +765,12 @@
         marker.note = $("markerNote").value.trim();
         marker.updatedAt = Date.now();
       } else {
+        const cfg = getGithubConfig();
+        if (!cfg.owner || !cfg.repo || !cfg.token) {
+          alert("請先填 GitHub 帳號、Repo、Token，並按「讀取 GitHub」登入後才能標記。");
+          closeModal();
+          return;
+        }
         const player = $("playerName").value.trim();
         if (!player) {
           alert("請先在左側填寫你的名字，才可以新增標記。");
@@ -815,33 +826,37 @@
     async function loadFromGithub() {
       const cfg = getGithubConfig();
       if (!cfg.owner || !cfg.repo || !cfg.token) {
-        setStatus("請先填 GitHub 帳號 / Repo / Token", "bad");
+        setStatus("必須填 GitHub 帳號 / Repo / Token 才能使用", "bad");
         return;
       }
+
       try {
         setStatus("GitHub 讀取中...", "warn");
         const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`;
         const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${cfg.token}`, Accept: "application/vnd.github+json" }
+          headers: {
+            Authorization: `Bearer ${cfg.token}`,
+            Accept: "application/vnd.github+json"
+          }
         });
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         githubSha = data.sha;
         const parsed = JSON.parse(b64decodeUtf8(data.content.replace(/\n/g, "")) || "{}");
         allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : parsed;
-        saveLocalData();
         renderMarkers();
-        setStatus("已從 GitHub 讀取", "ok");
+        setStatus("已登入並讀取 GitHub；新增/修改會同步給所有人", "ok");
       } catch (err) {
         console.error(err);
-        setStatus("GitHub 讀取失敗", "bad");
+        setStatus("GitHub 讀取失敗：請確認 Token 權限 Contents Read and Write", "bad");
       }
     }
 
     async function pushToGithub(message) {
       const cfg = getGithubConfig();
       if (!cfg.owner || !cfg.repo || !cfg.token) {
-        setStatus("已存在本機；未設定 GitHub 同步", "warn");
+        setStatus("未登入 GitHub Token，無法儲存標記", "bad");
+        alert("未登入 GitHub Token，無法儲存標記。");
         return;
       }
       try {
