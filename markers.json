@@ -22,6 +22,26 @@
       "owner": "BYwayJu",
       "createdAt": 1779370905730,
       "updatedAt": 1779370910572
+    },
+    {
+      "id": "2e1e2b98-90d3-411f-946f-d240572d7c1a",
+      "xPct": 34.811774479657394,
+      "yPct": 71.55491553595817,
+      "icon": "🏛️",
+      "name": "~",
+      "note": "~",
+      "owner": "BYwayJu",
+      "createdAt": 1779371324441
+    },
+    {
+      "id": "820a6344-10df-4b77-bbfb-f11144b5ca65",
+      "xPct": 49.47825007826081,
+      "yPct": 73.01322987104658,
+      "icon": "🏛️",
+      "name": "~",
+      "note": "~",
+      "owner": "BYwayJu",
+      "createdAt": 1779371326363
     }
   ]
 }
