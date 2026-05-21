@@ -1,154 +1,86 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GTAV 私人地圖標記</title>
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif; background: #0b1020; color: #fff; }
-    .app { display: grid; grid-template-columns: 360px 1fr; height: 100vh; }
-    .sidebar { border-right: 1px solid #243047; background: #101827; padding: 14px; overflow: auto; }
-    .viewer { position: relative; overflow: hidden; background: #243845; touch-action: none; }
-    .card { background: #0f172a; border: 1px solid #2d3c57; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
-    .title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
-    .subtitle { font-size: 13px; color: #c7d2fe; line-height: 1.5; }
-    label { display: block; font-size: 13px; margin: 8px 0 4px; color: #dbeafe; }
-    input, select, textarea, button { width: 100%; border-radius: 12px; border: 1px solid #334155; background: #111c31; color: white; padding: 10px 12px; font-size: 14px; }
-    textarea { min-height: 90px; resize: vertical; }
-    button { cursor: pointer; font-weight: 700; background: #0891b2; border: none; }
-    .muted-btn { background: #334155; }
-    .danger { background: #991b1b; }
-    .row { display: flex; gap: 8px; }
-    .row > * { flex: 1; }
-    .icon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 260px; overflow: auto; margin-top: 8px; }
-    .icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 62px; font-size: 22px; background: #1e293b; border: 1px solid #334155; padding: 8px 6px; }
-    .icon-btn span { font-size: 11px; line-height: 1.2; text-align: center; color: #d1d5db; font-weight: 500; }
-    .icon-btn.active { outline: 2px solid #22d3ee; background: #0e7490; }
-    .topbar { position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; gap: 8px; pointer-events: auto; }
-    .topbar button { width: auto; min-width: 44px; padding: 10px 12px; background: rgba(15,23,42,.92); border: 1px solid #334155; }
-    .hint { position: absolute; left: 12px; bottom: 12px; z-index: 10; padding: 8px 10px; border-radius: 12px; background: rgba(15,23,42,.88); border: 1px solid #334155; color: #cbd5e1; font-size: 10px; }
-    #stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
-    #stage img { display: block; user-select: none; -webkit-user-drag: none; max-width: none; }
-    .marker { position: absolute; transform: translate(-50%, -100%); background: transparent; border: none; padding: 0; cursor: pointer; font-size: 16px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,.9)); text-rendering: geometricPrecision; -webkit-font-smoothing: antialiased; width: auto; }
-    /* 修正：不要讓名稱標籤一直顯示，避免被縮放後變成一條一條黑線 */
-    .marker-label { display: none; margin-top: 2px; white-space: nowrap; border-radius: 999px; font-size: 10px; background: rgba(15,23,42,.90); border: 1px solid #334155; padding: 2px 7px; transform: translateX(-28%); color: #fff; }
-    .marker:hover .marker-label, .marker:focus .marker-label { display: block; }
-    .small { font-size: 10px; color: #cbd5e1; line-height: 1.5; }
-    .status-ok { color: #86efac; }
-    .status-warn { color: #fde68a; }
-    .status-bad { color: #fca5a5; }
-    .marker-list { display: flex; flex-direction: column; gap: 8px; }
-    .marker-item { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 10px; text-align: left; }
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
-    .modal-box { width: min(440px, 100%); background: #111827; border: 1px solid #334155; border-radius: 18px; padding: 18px; }
-    @media (max-width: 900px) {
-      .app { grid-template-columns: 1fr; grid-template-rows: 44vh 56vh; }
-      .sidebar { border-right: none; border-bottom: 1px solid #243047; }
-      .topbar { top: 8px; right: 8px; }
-      .topbar button { padding: 8px 10px; }
-    }
-  
-    /* 可讀性加強：左側文字全部放大 */
-    .sidebar {
-      font-size: 17px;
-    }
-    .sidebar label {
-      font-size: 17px !important;
-      font-weight: 700;
-    }
-    .sidebar input,
-    .sidebar select,
-    .sidebar textarea,
-    .sidebar button {
-      font-size: 17px !important;
-      padding: 12px 14px !important;
-    }
-    .sidebar .small {
-      font-size: 15px !important;
-      line-height: 1.75 !important;
-    }
-    .sidebar .card b {
-      font-size: 18px;
-    }
-    .sidebar .title {
-      font-size: 30px !important;
-    }
-    .sidebar .subtitle {
-      font-size: 15px !important;
-      line-height: 1.7 !important;
-    }
-    .icon-btn span {
-      font-size: 13px !important;
-    }
-
-    /* 標記資訊：上方顯示輸入內容，下方顯示誰標記 */
-    .marker-label {
-      text-align: center;
-      line-height: 1.25;
-      min-width: max-content;
-    }
-    .marker-label .marker-name {
-      display: block;
-      font-weight: 800;
-      font-size: 12px;
-      color: #ffffff;
-    }
-    .marker-label .marker-owner {
-      display: block;
-      font-size: 10px;
-      color: #facc15;
-      margin-top: 1px;
-    }
-
-    @media(max-width:850px){
-      .sidebar {
-        font-size: 16px;
-      }
-      .sidebar label {
-        font-size: 16px !important;
-      }
-      .sidebar input,
-      .sidebar select,
-      .sidebar textarea,
-      .sidebar button {
-        font-size: 16px !important;
-        padding: 12px 14px !important;
-      }
-      .sidebar .small {
-        font-size: 14px !important;
-      }
-      .icon-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-      }
-    }
-
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GTAV 私人地圖標記</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;background:#0b1020;color:#fff}
+.app{display:grid;grid-template-columns:380px 1fr;height:100vh}
+.sidebar{background:#101827;border-right:1px solid #263247;padding:16px;overflow:auto;font-size:17px}
+.viewer{position:relative;overflow:hidden;background:#243845;touch-action:none}
+.card{background:#0f172a;border:1px solid #2d3c57;border-radius:16px;padding:14px;margin-bottom:14px}
+.title{font-size:30px;font-weight:800;margin-bottom:8px}
+.subtitle{font-size:16px;color:#c7d2fe;line-height:1.65}
+label{display:block;font-size:17px;font-weight:700;margin:10px 0 5px;color:#dbeafe}
+input,select,textarea,button{width:100%;border-radius:12px;border:1px solid #334155;background:#111c31;color:#fff;padding:12px 14px;font-size:17px}
+textarea{min-height:90px;resize:vertical}
+button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
+.muted-btn{background:#334155}
+.danger{background:#991b1b}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.small{font-size:15px;color:#dbeafe;line-height:1.75}
+.warn{color:#fde68a}
+.ok{color:#86efac}
+.bad{color:#fca5a5}
+.icon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:260px;overflow:auto;margin-top:8px}
+.icon-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;font-size:20px;background:#1e293b;border:1px solid #334155;padding:8px 6px}
+.icon-btn span{font-size:13px;line-height:1.2;color:#d1d5db;font-weight:500}
+.icon-btn.active{outline:2px solid #22d3ee;background:#0e7490}
+.topbar{position:absolute;top:12px;right:12px;z-index:10;display:flex;gap:8px}
+.topbar button{width:auto;min-width:44px;padding:10px 12px;background:rgba(15,23,42,.92);border:1px solid #334155}
+.hint{position:absolute;left:12px;bottom:12px;z-index:10;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
+#stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+#stage img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
+.marker{position:absolute;transform:translate(-50%,-100%) scale(var(--marker-scale,1));transform-origin:center bottom;background:transparent;border:none;padding:0;cursor:grab;font-size:16px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));width:auto;touch-action:none}
+.marker:active{cursor:grabbing}
+.marker-label{display:none;margin-top:2px;white-space:nowrap;border-radius:10px;background:rgba(15,23,42,.92);border:1px solid #334155;padding:4px 8px;transform:translateX(-32%);text-align:center;line-height:1.25}
+.marker:hover .marker-label,.marker:focus .marker-label{display:block}
+.marker-name{display:block;font-weight:800;font-size:12px;color:#fff}
+.marker-owner{display:block;font-size:10px;color:#facc15;margin-top:1px}
+.marker-list{display:flex;flex-direction:column;gap:8px}
+.marker-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;text-align:left}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal-box{width:min(440px,100%);background:#111827;border:1px solid #334155;border-radius:18px;padding:18px}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;grid-template-rows:52vh 48vh}
+  .sidebar{order:1;max-height:52vh;border-right:none;border-bottom:1px solid #263247;font-size:16px}
+  .viewer{order:2}
+  input,select,textarea,button{font-size:16px;padding:12px 14px}
+  label{font-size:16px}
+  .small{font-size:14px}
+  .icon-grid{grid-template-columns:repeat(3,1fr);max-height:220px}
+}
+</style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="title">GTAV 私人地圖</div>
-      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記。外面的人只能重新讀取標記；要標記/修改/刪除，必須填名字與 GitHub Token。</div>
+<div class="app">
+<aside class="sidebar">
+  <div class="title">GTAV 私人地圖</div>
+  <div class="subtitle">所有人打開都能看到公開標記；新增/修改/刪除會先存在自己本機，按「上傳同步」才公開給大家。</div>
 
-      <div class="card">
-        <label>地圖樣式</label>
-        <select id="mapSelect" onchange="switchMap(this.value)">
-          <option value="map-atlas.png">彩色 Atlas</option>
-          <option value="map-satellite.jpg">衛星圖</option>
-          <option value="map-roadmap.png">Roadmap</option>
-        </select>
-        <div class="row" style="margin-top:8px;">
-          <button type="button" onclick="zoomBy(1.2)">放大</button>
-          <button type="button" onclick="zoomBy(0.83)">縮小</button>
-          <button type="button" class="muted-btn" onclick="resetView()">重置</button>
-        </div>
-      </div>
+  <div class="card">
+    <label>地圖樣式</label>
+    <select id="mapSelect" onchange="switchMap(this.value)">
+      <option value="map-atlas.png">彩色 Atlas</option>
+      <option value="map-satellite.jpg">衛星圖</option>
+      <option value="map-roadmap.png">Roadmap</option>
+    </select>
+    <div class="row" style="margin-top:8px">
+      <button type="button" onclick="zoomBy(1.2)">放大</button>
+      <button type="button" onclick="zoomBy(0.83)">縮小</button>
+      <button type="button" class="muted-btn" onclick="resetView()">重置</button>
+    </div>
+  </div>
 
-      <div class="card">
-        <label>標記圖案</label>
-        <select id="iconSelect" onchange="selectIcon(this.value)">
-          <option value="🏠">🏠 房子</option>
+  <div class="card">
+    <label>你的名字（會顯示誰標記）</label>
+    <input id="playerName" placeholder="例如 BYWAY" />
+    <label>標記圖案</label>
+    <select id="iconSelect" onchange="selectIcon(this.value)">
+      <option value="🏠">🏠 房子</option>
 <option value="💎">💎 鑽石</option>
 <option value="🐟">🐟 魚</option>
 <option value="📄">📄 紙張</option>
@@ -162,926 +94,157 @@
 <option value="🪝">🪝 釣魚佈告欄</option>
 <option value="🪵">🪵 鋸木廠</option>
 <option value="🧭">🧭 導航點</option>
-<option value="🚩">🚩 AFTERLIFE'S TUNER</option>
 <option value="🚗">🚗 二手車商</option>
-<option value="🧺">🧺 伐木工商店</option>
 <option value="🅿️">🅿️ 停車場</option>
-<option value="⚡">⚡ 刺青店</option>
 <option value="🛒">🛒 商店</option>
-<option value="🏛️">🏛️ 市政廳</option>
-<option value="🛠️">🛠️ 怪獸車廠</option>
-<option value="⛪">⛪ 教堂</option>
-<option value="👕">👕 服飾店</option>
+<option value="🏥">🏥 醫院</option>
+<option value="🛡️">🛡️ 警局</option>
 <option value="🔧">🔧 機械師</option>
 <option value="🔫">🔫 武器商人</option>
-<option value="🎵">🎵 沙威瑪店</option>
-<option value="🎣">🎣 漁具店</option>
-<option value="✂️">✂️ 理髮廳</option>
-<option value="🍰">🍰 甜點店</option>
-<option value="🥬">🥬 生鮮市場</option>
-<option value="🔐">🔐 監獄</option>
-<option value="⛏️">⛏️ 礦業店</option>
-<option value="🚙">🚙 租車公司</option>
-<option value="🧰">🧰 置物櫃</option>
-<option value="🛡️">🛡️ 艾爾塔警局</option>
-<option value="🚕">🚕 車輛經銷商</option>
-<option value="🏥">🏥 醫院</option>
-<option value="🧲">🧲 金屬檢測店</option>
 <option value="⚡">⚡ 電力維修工</option>
-<option value="✈️">✈️ 飛機扣押場</option>
 <option value="🏨">🏨 飯店</option>
-<option value="🧼">🧼 高壓清洗工</option>
 <option value="📍">📍 一般標記</option>
-        </select>
-        <div class="icon-grid">
-          <button type="button" class="icon-btn" onclick="selectIcon('🏠')" title="房子">🏠<span>房子</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('💎')" title="鑽石">💎<span>鑽石</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🐟')" title="魚">🐟<span>魚</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('📄')" title="紙張">📄<span>紙張</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('📱')" title="平板">📱<span>平板</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🏭')" title="托車廠">🏭<span>托車廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🪓')" title="伐木中心">🪓<span>伐木中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🎣')" title="漁業中心">🎣<span>漁業中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('⛏️')" title="礦業中心">⛏️<span>礦業中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('💠')" title="礦石清洗區">💠<span>礦石清洗區</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🚜')" title="農場管理員">🚜<span>農場管理員</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🪝')" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🪵')" title="鋸木廠">🪵<span>鋸木廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🧭')" title="導航點">🧭<span>導航點</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🚩')" title="AFTERLIFE'S TUNER">🚩<span>AFTERLIFE'S TUNER</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🚗')" title="二手車商">🚗<span>二手車商</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🧺')" title="伐木工商店">🧺<span>伐木工商店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🅿️')" title="停車場">🅿️<span>停車場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('⚡')" title="刺青店">⚡<span>刺青店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🛒')" title="商店">🛒<span>商店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🏛️')" title="市政廳">🏛️<span>市政廳</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🛠️')" title="怪獸車廠">🛠️<span>怪獸車廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('⛪')" title="教堂">⛪<span>教堂</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('👕')" title="服飾店">👕<span>服飾店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🔧')" title="機械師">🔧<span>機械師</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🔫')" title="武器商人">🔫<span>武器商人</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🎵')" title="沙威瑪店">🎵<span>沙威瑪店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🎣')" title="漁具店">🎣<span>漁具店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('✂️')" title="理髮廳">✂️<span>理髮廳</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🍰')" title="甜點店">🍰<span>甜點店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🥬')" title="生鮮市場">🥬<span>生鮮市場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🔐')" title="監獄">🔐<span>監獄</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('⛏️')" title="礦業店">⛏️<span>礦業店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🚙')" title="租車公司">🚙<span>租車公司</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🧰')" title="置物櫃">🧰<span>置物櫃</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🛡️')" title="艾爾塔警局">🛡️<span>艾爾塔警局</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🚕')" title="車輛經銷商">🚕<span>車輛經銷商</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🏥')" title="醫院">🏥<span>醫院</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🧲')" title="金屬檢測店">🧲<span>金屬檢測店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('⚡')" title="電力維修工">⚡<span>電力維修工</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('✈️')" title="飛機扣押場">✈️<span>飛機扣押場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🏨')" title="飯店">🏨<span>飯店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('🧼')" title="高壓清洗工">🧼<span>高壓清洗工</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon('📍')" title="一般標記">📍<span>一般標記</span></button>
-        </div>
-        <label>自訂圖示（可留空）</label>
-        <input id="customIcon" placeholder="例如 💰" />
-
-        <label>顯示分類</label>
-        <select id="filterIcon" onchange="setFilter(this.value)">
-          <option value="all">全部顯示</option>
-          <option value="🏠">🏠 房子</option>
-          <option value="💎">💎 鑽石</option>
-          <option value="🐟">🐟 魚</option>
-          <option value="📄">📄 紙張</option>
-          <option value="📱">📱 平板</option>
-          <option value="🏭">🏭 托車廠</option>
-          <option value="🚜">🚜 農場</option>
-          <option value="🎣">🎣 釣魚</option>
-          <option value="⛏️">⛏️ 礦業</option>
-          <option value="🪓">🪓 伐木</option>
-        </select>
-
-        <div class="row" style="margin-top:8px;">
-          <button type="button" id="modeBtn" onclick="toggleEditMode()">目前：編輯模式</button>
-          <button type="button" class="muted-btn" onclick="clearFilter()">顯示全部</button>
-        </div>
-
-        <div class="small">必須先填寫你的名字才能標記。編輯模式：點地圖本體新增標記、按住標記拖曳移動、點標記可修改。觀看模式：不會誤新增。電腦右鍵或手機長按標記可刪除。</div>
-      </div>
-
-      <div class="card">
-        <input id="ghOwner" type="hidden" value="BYwayJu" />
-        <input id="ghRepo" type="hidden" value="gtav-map" />
-        <input id="ghBranch" type="hidden" value="main" />
-        <input id="ghPath" type="hidden" value="markers.json" />
-
-        <label>你的名字（必填，會顯示誰標記）</label>
-        <input id="playerName" placeholder="例如 阿甫 / 小白" />
-
-        <label>GitHub Token（修改標記時才需要）</label>
-        <input id="ghToken" type="password" placeholder="同步已修改標記時貼 github_pat_ Token" />
-        <div class="small status-warn">外面的人可以直接重新讀取標記；要新增、移動、修改、刪除標記，必須填名字與 GitHub Token。</div>
-        <div class="row" style="margin-top:8px;">
-          <button type="button" onclick="saveSettings()">儲存設定</button>
-          <button type="button" class="muted-btn" onclick="loadFromGithub()">重新讀取標記</button>
-        </div>
-        <div id="syncStatus" class="small status-warn" style="margin-top:8px;">公開讀取模式；標記/修改/刪除必須填 GitHub Token</div>
-      </div>
-
-        <div class="card" style="margin-top:10px;">
-          <b>如何取得 GitHub Token？</b>
-          <ol class="small" style="padding-left:18px; line-height:1.7;">
-            <li>打開 GitHub，點右上角頭像。</li>
-            <li>進入 <b>Settings</b>。</li>
-            <li>左側滑到最下面，點 <b>Developer settings</b>。</li>
-            <li>點 <b>Personal access tokens</b>。</li>
-            <li>選 <b>Fine-grained tokens</b>。</li>
-            <li>點 <b>Generate new token</b>。</li>
-            <li><b>Repository access</b> 選 <b>Only select repositories</b>，選這個專案 <b>gtav-map</b>。</li>
-            <li><b>Repository permissions</b> 裡把 <b>Contents</b> 設成 <b>Read and write</b>。</li>
-            <li>產生後複製 <b>github_pat_</b> 開頭的 Token，貼到上面的欄位。</li>
-          </ol>
-          <div class="small status-warn">Token 只會顯示一次。不要公開給陌生人；每個人只有要新增、移動、修改、刪除標記時才需要自己的 Token。</div>
-        </div>
-
-
-      <div class="card">
-        <div id="markerCount" class="small">共 0 個標記</div>
-        <div id="markerList" class="marker-list" style="margin-top:8px;"></div>
-      </div>
-    </aside>
-
-    <main id="viewer" class="viewer">
-      <div id="topbar" class="topbar">
-        <button type="button" onclick="zoomBy(1.2)">＋</button>
-        <button type="button" onclick="zoomBy(0.83)">－</button>
-        <button type="button" onclick="resetView()">重置</button>
-      </div>
-      <div id="stage">
-        <img id="mapImage" alt="map" draggable="false" />
-      </div>
-      <div class="hint">滿版地圖｜滿版地圖｜手機：單指拖曳、雙指縮放｜電腦：拖曳、滾輪縮放</div>
-    </main>
+    </select>
+    <div class="icon-grid"><button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe0")" title="房子">🏠<span>房子</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc8e")" title="鑽石">💎<span>鑽石</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc1f")" title="魚">🐟<span>魚</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udcc4")" title="紙張">📄<span>紙張</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udcf1")" title="平板">📱<span>平板</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfed")" title="托車廠">🏭<span>托車廠</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\ude93")" title="伐木中心">🪓<span>伐木中心</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfa3")" title="漁業中心">🎣<span>漁業中心</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\u26cf\ufe0f")" title="礦業中心">⛏️<span>礦業中心</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udca0")" title="礦石清洗區">💠<span>礦石清洗區</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude9c")" title="農場管理員">🚜<span>農場管理員</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\ude9d")" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udeb5")" title="鋸木廠">🪵<span>鋸木廠</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udded")" title="導航點">🧭<span>導航點</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude97")" title="二手車商">🚗<span>二手車商</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udd7f\ufe0f")" title="停車場">🅿️<span>停車場</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\uded2")" title="商店">🛒<span>商店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe5")" title="醫院">🏥<span>醫院</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udee1\ufe0f")" title="警局">🛡️<span>警局</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd27")" title="機械師">🔧<span>機械師</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd2b")" title="武器商人">🔫<span>武器商人</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\u26a1")" title="電力維修工">⚡<span>電力維修工</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe8")" title="飯店">🏨<span>飯店</span></button>
+<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udccd")" title="一般標記">📍<span>一般標記</span></button></div>
+    <label>自訂圖示（可留空）</label>
+    <input id="customIcon" placeholder="例如 💰" />
+    <div class="small">點地圖新增標記；按住標記可拖曳移動；點標記可編輯。</div>
   </div>
 
-  <div id="markerModal" class="modal">
-    <div class="modal-box">
-      <h3 id="modalTitle" style="margin-top:0;">新增標記</h3>
-      <label>名稱</label>
-      <input id="markerName" placeholder="請輸入標記名稱" />
-      <div id="markerOwnerInfo" class="small" style="margin-top:6px;"></div>
-      <label>備註</label>
-      <textarea id="markerNote" placeholder="可填價格、用途、說明"></textarea>
-      <div class="row" style="margin-top:10px;">
-        <button type="button" onclick="saveMarker()">儲存</button>
-        <button type="button" class="muted-btn" onclick="closeModal()">取消</button>
-      </div>
-      <button id="deleteBtn" type="button" class="danger" style="margin-top:10px; display:none;" onclick="deleteMarker()">刪除標記</button>
+  <div class="card">
+    <label>GitHub Token（只有上傳同步才需要）</label>
+    <input id="ghToken" type="password" placeholder="要同步時貼 github_pat_ Token" />
+    <div class="small warn">不填 Token 也能看公開標記、也能本機標記；按「上傳同步」才需要 Token。</div>
+    <div class="row" style="margin-top:8px">
+      <button type="button" onclick="saveSettings()">儲存設定</button>
+      <button type="button" class="muted-btn" onclick="loadPublicMarkers(true)">重新讀取標記</button>
+      <button type="button" onclick="uploadSync()">上傳同步</button>
     </div>
+    <div id="syncStatus" class="small warn" style="margin-top:8px">目前：觀看公開標記 / 本機編輯模式</div>
   </div>
 
-  <script>
-    const $ = (id) => document.getElementById(id);
-    const viewer = $("viewer");
-    const stage = $("stage");
-    const mapImage = $("mapImage");
-    const modal = $("markerModal");
-    const topbar = $("topbar");
-
-    let activeMap = localStorage.getItem("gtav_active_map") || "map-atlas.png";
-    let selectedIcon = localStorage.getItem("gtav_selected_icon") || "🏠";
-    let allMarkers = {};
-    let editingMarkerId = null;
-    let pendingPoint = null;
-    let githubSha = null;
-    let githubWriteReady = false;
-
-    let viewState = { scale: 1, x: 0, y: 0 };
-    let imgSize = { w: 1, h: 1 };
-    let baseScale = 1;
-    let dragInfo = { active: false, moved: false, x: 0, y: 0, blocked: false };
-    let pinchInfo = null;
-    let movingMarkerId = null;
-    let movingMarkerMoved = false;
-    let suppressNextMarkerClick = false;
-    let imageMaskCanvas = document.createElement("canvas");
-    let imageMaskCtx = imageMaskCanvas.getContext("2d", { willReadFrequently: true });
-    let bgColor = [0, 0, 0];
-    let editMode = localStorage.getItem("gtav_edit_mode") !== "view";
-    let activeFilter = localStorage.getItem("gtav_filter_icon") || "all";
-    let longPressTimer = null;
-
-    /* 修正：右上角控制按鈕不要冒泡到地圖，避免按 + - 重置變新增標籤 */
-    ["click", "pointerdown", "pointerup", "mousedown", "mouseup", "touchstart", "touchend"].forEach(evt => {
-      topbar.addEventListener(evt, (e) => e.stopPropagation(), { passive: false });
-    });
-
-    function isControlTarget(target) {
-      return !!target.closest("button, input, select, textarea, .topbar, .sidebar, .modal");
-    }
-
-    function getMarkerBucket() {
-      return allMarkers[activeMap] || [];
-    }
-
-    function setMarkerBucket(list) {
-      allMarkers[activeMap] = list;
-      saveLocalData();
-    }
-
-    function getLocalKey() {
-      return "gtav_markers_local";
-    }
-
-    function getLocalKey() {
-      return "gtav_markers_local";
-    }
-
-    function saveLocalData() {
-      // 標記資料以 GitHub markers.json 為準；本機只保存目前地圖和選擇圖示
-      localStorage.setItem("gtav_active_map", activeMap);
-      localStorage.setItem("gtav_selected_icon", selectedIcon);
-    }
-
-    function loadLocalData() {
-      allMarkers = {};
-    }
-
-    function saveSettings() {
-      ["playerName","ghToken"].forEach(id => {
-        const el = $(id);
-        if (el) localStorage.setItem("gtav_" + id, el.value);
-      });
-
-      const player = $("playerName")?.value.trim();
-      const token = $("ghToken")?.value.trim();
-
-      if (player && token) {
-        setStatus("設定已儲存。你可以按「重新讀取標記」登入並啟用修改權限。", "ok");
-      } else if (player && !token) {
-        setStatus("設定已儲存。目前是觀看模式；修改標記需要 Token。", "warn");
-      } else {
-        setStatus("請先填你的名字。觀看不需要 Token，修改才需要。", "warn");
-      }
-    }
-
-    function loadSettings() {
-      ["playerName","ghToken"].forEach(id => {
-        const v = localStorage.getItem("gtav_" + id);
-        if (v !== null) $(id).value = v;
-      });
-    }
-
-    function setStatus(text, type="warn") {
-      const el = $("syncStatus");
-      el.textContent = text;
-      el.className = "small " + (type === "ok" ? "status-ok" : type === "bad" ? "status-bad" : "status-warn");
-    }
-
-    function selectIcon(icon) {
-      selectedIcon = icon;
-      $("iconSelect").value = icon;
-      document.querySelectorAll(".icon-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.textContent.includes(icon));
-      });
-      localStorage.setItem("gtav_selected_icon", selectedIcon);
-    }
-
-    function toggleEditMode() {
-      editMode = !editMode;
-      localStorage.setItem("gtav_edit_mode", editMode ? "edit" : "view");
-      updateModeButton();
-    }
-
-    function updateModeButton() {
-      const btn = $("modeBtn");
-      if (!btn) return;
-      btn.textContent = editMode ? "目前：編輯模式" : "目前：觀看模式";
-      btn.classList.toggle("edit-mode", editMode);
-      btn.classList.toggle("view-mode", !editMode);
-    }
-
-    function setFilter(icon) {
-      activeFilter = icon || "all";
-      localStorage.setItem("gtav_filter_icon", activeFilter);
-      const sel = $("filterIcon");
-      if (sel) sel.value = activeFilter;
-      renderMarkers();
-    }
-
-    function clearFilter() {
-      setFilter("all");
-    }
-
-    function getVisibleMarkers() {
-      const markers = getMarkerBucket();
-      if (activeFilter === "all") return markers;
-      return markers.filter(m => m.icon === activeFilter);
-    }
-
-    function confirmDeleteMarker(id) {
-      if (!canEditMarkers(true)) return;
-      const markers = getMarkerBucket();
-      const marker = markers.find(m => m.id === id);
-      if (!marker) return;
-      if (!confirm(`刪除標記「${marker.name}」？`)) return;
-      setMarkerBucket(markers.filter(m => m.id !== id));
-      renderMarkers();
-      pushToGithub("delete marker");
-    }
-
-    function switchMap(mapName) {
-      activeMap = mapName;
-      $("mapSelect").value = mapName;
-      mapImage.src = mapName + "?v=" + Date.now();
-      saveLocalData();
-    }
-
-    mapImage.onload = () => {
-      imgSize = { w: mapImage.naturalWidth, h: mapImage.naturalHeight };
-
-      // 建立像素遮罩：用四個角落的平均色作為「圖外背景色」參考
-      imageMaskCanvas.width = imgSize.w;
-      imageMaskCanvas.height = imgSize.h;
-      imageMaskCtx.clearRect(0, 0, imgSize.w, imgSize.h);
-      imageMaskCtx.drawImage(mapImage, 0, 0);
-
-      function sample(x, y) {
-        const d = imageMaskCtx.getImageData(Math.max(0, Math.min(imgSize.w - 1, x)), Math.max(0, Math.min(imgSize.h - 1, y)), 1, 1).data;
-        return [d[0], d[1], d[2], d[3]];
-      }
-
-      const p1 = sample(5, 5);
-      const p2 = sample(imgSize.w - 6, 5);
-      const p3 = sample(5, imgSize.h - 6);
-      const p4 = sample(imgSize.w - 6, imgSize.h - 6);
-      bgColor = [
-        Math.round((p1[0] + p2[0] + p3[0] + p4[0]) / 4),
-        Math.round((p1[1] + p2[1] + p3[1] + p4[1]) / 4),
-        Math.round((p1[2] + p2[2] + p3[2] + p4[2]) / 4),
-      ];
-
-      resetView();
-      renderMarkers();
-    };
-
-    function resetView() {
-      const rect = viewer.getBoundingClientRect();
-
-      // 滿版模式：用 cover 而不是 contain
-      // 會讓地圖填滿整個畫面，不留左右/上下空白；多出來的部分會在畫面外，可拖曳查看。
-      const scale = Math.max(rect.width / imgSize.w, rect.height / imgSize.h);
-
-      viewState.scale = scale;
-      baseScale = scale;
-      viewState.x = (rect.width - imgSize.w * scale) / 2;
-      viewState.y = (rect.height - imgSize.h * scale) / 2;
-      applyView();
-    }
-
-    function clampView() {
-      const rect = viewer.getBoundingClientRect();
-      const scaledW = imgSize.w * viewState.scale;
-      const scaledH = imgSize.h * viewState.scale;
-
-      // 若圖片比視窗小，保持置中；若圖片比視窗大，避免整張被拖/縮到視窗外完全不見
-      if (scaledW <= rect.width) {
-        viewState.x = (rect.width - scaledW) / 2;
-      } else {
-        viewState.x = Math.min(60, Math.max(rect.width - scaledW - 60, viewState.x));
-      }
-
-      if (scaledH <= rect.height) {
-        viewState.y = (rect.height - scaledH) / 2;
-      } else {
-        viewState.y = Math.min(60, Math.max(rect.height - scaledH - 60, viewState.y));
-      }
-    }
-
-    function applyView() {
-      clampView();
-      stage.style.transform = `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`;
-      // 標記大小規則：
-      // 地圖縮小/初始時：圖示很小
-      // 地圖越放大：圖示才逐步變大
-      // 但不會跟著地圖無限放大
-      const zoomRatio = Math.max(0.01, viewState.scale / Math.max(baseScale, 0.01));
-      const desiredScreenScale = Math.max(0.055, Math.min(0.18, 0.065 * Math.sqrt(zoomRatio)));
-      stage.style.setProperty("--marker-scale", String(desiredScreenScale / viewState.scale));
-    }
-
-    function zoomAt(factor, cx, cy) {
-      const beforeX = (cx - viewState.x) / viewState.scale;
-      const beforeY = (cy - viewState.y) / viewState.scale;
-      viewState.scale = Math.max(baseScale * 0.65, Math.min(baseScale * 8, viewState.scale * factor));
-      viewState.x = cx - beforeX * viewState.scale;
-      viewState.y = cy - beforeY * viewState.scale;
-      applyView();
-    }
-
-    function zoomBy(factor) {
-      const rect = viewer.getBoundingClientRect();
-      zoomAt(factor, rect.width / 2, rect.height / 2);
-    }
-
-    function screenToImage(clientX, clientY) {
-      const rect = viewer.getBoundingClientRect();
-      const x = (clientX - rect.left - viewState.x) / viewState.scale;
-      const y = (clientY - rect.top - viewState.y) / viewState.scale;
-      return {
-        xPct: Math.max(0, Math.min(100, (x / imgSize.w) * 100)),
-        yPct: Math.max(0, Math.min(100, (y / imgSize.h) * 100)),
-      };
-    }
-
-    function isPointInsideImage(clientX, clientY) {
-      const rect = viewer.getBoundingClientRect();
-      const x = (clientX - rect.left - viewState.x) / viewState.scale;
-      const y = (clientY - rect.top - viewState.y) / viewState.scale;
-      return x >= 0 && x <= imgSize.w && y >= 0 && y <= imgSize.h;
-    }
-
-    function isPointAllowedForMarker(clientX, clientY) {
-      if (!isPointInsideImage(clientX, clientY)) return false;
-      const rect = viewer.getBoundingClientRect();
-      const x = Math.round((clientX - rect.left - viewState.x) / viewState.scale);
-      const y = Math.round((clientY - rect.top - viewState.y) / viewState.scale);
-
-      const d = imageMaskCtx.getImageData(
-        Math.max(0, Math.min(imgSize.w - 1, x)),
-        Math.max(0, Math.min(imgSize.h - 1, y)),
-        1, 1
-      ).data;
-
-      // 若點到的顏色非常接近圖片四角外圍背景色，視為「圖外 / 外圍海域 / 空白區」
-      const dist = Math.sqrt(
-        Math.pow(d[0] - bgColor[0], 2) +
-        Math.pow(d[1] - bgColor[1], 2) +
-        Math.pow(d[2] - bgColor[2], 2)
-      );
-
-      // 門檻可讓藍色外圍背景不能新增；地圖本體大多能正常新增
-      return dist > 38;
-    }
-
-    window.addEventListener("pointermove", (e) => {
-      if (!movingMarkerId) return;
-      e.preventDefault();
-      movingMarkerMoved = true;
-      const point = screenToImage(e.clientX, e.clientY);
-      const markers = getMarkerBucket();
-      const marker = markers.find(x => x.id === movingMarkerId);
-      if (!marker) return;
-      marker.xPct = point.xPct;
-      marker.yPct = point.yPct;
-      setMarkerBucket(markers);
-      renderMarkers();
-    }, { passive: false });
-
-    window.addEventListener("pointerup", () => {
-      if (!movingMarkerId) return;
-      if (movingMarkerMoved) {
-        suppressNextMarkerClick = true;
-        pushToGithub("move marker");
-      }
-      movingMarkerId = null;
-      movingMarkerMoved = false;
-      setTimeout(() => { suppressNextMarkerClick = false; }, 80);
-    });
-
-    viewer.addEventListener("wheel", (e) => {
-      if (isControlTarget(e.target)) return;
-      e.preventDefault();
-      const rect = viewer.getBoundingClientRect();
-      zoomAt(e.deltaY < 0 ? 1.12 : 0.89, e.clientX - rect.left, e.clientY - rect.top);
-    }, { passive: false });
-
-    viewer.addEventListener("pointerdown", (e) => {
-      if (isControlTarget(e.target) || e.target.closest(".marker") || movingMarkerId) {
-        dragInfo.blocked = true;
-        return;
-      }
-      viewer.setPointerCapture(e.pointerId);
-      dragInfo.active = true;
-      dragInfo.blocked = false;
-      dragInfo.moved = false;
-      dragInfo.x = e.clientX;
-      dragInfo.y = e.clientY;
-    });
-
-    viewer.addEventListener("pointermove", (e) => {
-      if (!dragInfo.active || dragInfo.blocked || pinchInfo) return;
-      const dx = e.clientX - dragInfo.x;
-      const dy = e.clientY - dragInfo.y;
-      if (Math.abs(dx) + Math.abs(dy) > 4) dragInfo.moved = true;
-      viewState.x += dx;
-      viewState.y += dy;
-      dragInfo.x = e.clientX;
-      dragInfo.y = e.clientY;
-      applyView();
-    });
-
-    viewer.addEventListener("pointerup", (e) => {
-      if (dragInfo.blocked || isControlTarget(e.target) || e.target.closest(".marker")) {
-        dragInfo.active = false;
-        dragInfo.blocked = false;
-        return;
-      }
-      if (!dragInfo.active) return;
-      dragInfo.active = false;
-      if (!dragInfo.moved && !pinchInfo && !dragInfo.blocked) {
-        if (!editMode) return;
-        const cfg = getGithubConfig();
-        if (!cfg.owner || !cfg.repo || !cfg.token) {
-          alert("請先填你的名字與 GitHub Token，並按「重新讀取標記」後才能標記。");
-          return;
-        }
-        const player = $("playerName").value.trim();
-        if (!player) {
-          alert("請先在左側填寫你的名字，才可以新增標記。");
-          $("playerName").focus();
-          return;
-        }
-        // 只允許在圖片本體、且不是外圍藍色背景的位置新增標記
-        if (!isPointAllowedForMarker(e.clientX, e.clientY)) return;
-        if (!canEditMarkers(true)) return;
-        pendingPoint = screenToImage(e.clientX, e.clientY);
-        openCreateModal();
-      }
-    });
-
-    viewer.addEventListener("touchstart", (e) => {
-      if (isControlTarget(e.target)) return;
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        dragInfo.active = false;
-        dragInfo.blocked = true;
-
-        const [a, b] = e.touches;
-        const rect = viewer.getBoundingClientRect();
-        const cx = ((a.clientX + b.clientX) / 2) - rect.left;
-        const cy = ((a.clientY + b.clientY) / 2) - rect.top;
-
-        pinchInfo = {
-          dist: Math.max(1, Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)),
-          scale: viewState.scale,
-          centerX: cx,
-          centerY: cy,
-          imageX: (cx - viewState.x) / viewState.scale,
-          imageY: (cy - viewState.y) / viewState.scale
-        };
-      }
-    }, { passive: false });
-
-    viewer.addEventListener("touchmove", (e) => {
-      if (e.touches.length === 2 && pinchInfo) {
-        e.preventDefault();
-        const [a, b] = e.touches;
-        const rect = viewer.getBoundingClientRect();
-        const dist = Math.max(1, Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY));
-        const cx = ((a.clientX + b.clientX) / 2) - rect.left;
-        const cy = ((a.clientY + b.clientY) / 2) - rect.top;
-
-        const nextScale = pinchInfo.scale * (dist / pinchInfo.dist);
-        viewState.scale = Math.max(baseScale * 0.65, Math.min(baseScale * 8, nextScale));
-
-        // 用雙指中心對準原本圖片座標，避免縮放時圖片瞬間飛走/消失
-        viewState.x = cx - pinchInfo.imageX * viewState.scale;
-        viewState.y = cy - pinchInfo.imageY * viewState.scale;
-        applyView();
-      }
-    }, { passive: false });
-
-    viewer.addEventListener("touchend", () => {
-      pinchInfo = null;
-      dragInfo.blocked = false;
-    });
-
-    function escapeHtml(text) {
-      return String(text).replace(/[&<>"']/g, (m) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[m]);
-    }
-
-    function renderMarkers() {
-      stage.querySelectorAll(".marker").forEach(el => el.remove());
-      const markers = getVisibleMarkers();
-
-      markers.forEach(marker => {
-        const btn = document.createElement("button");
-        btn.className = "marker";
-        btn.style.left = (marker.xPct * imgSize.w / 100) + "px";
-        btn.style.top = (marker.yPct * imgSize.h / 100) + "px";
-        btn.innerHTML = `${marker.icon}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner || "未命名")}</span></span>`;
-        btn.title = marker.name;
-
-        // 拖曳標記：按住標記移動，放開後自動儲存位置
-        btn.addEventListener("pointerdown", (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          if (!editMode) return;
-          if (!canEditMarkers(true)) return;
-          movingMarkerId = marker.id;
-          movingMarkerMoved = false;
-          suppressNextMarkerClick = false;
-          btn.setPointerCapture(e.pointerId);
-        });
-
-        btn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (suppressNextMarkerClick) {
-            suppressNextMarkerClick = false;
-            return;
-          }
-          if (editMode && canEditMarkers(true)) openEditModal(marker.id);
-        });
-
-        // 電腦右鍵刪除
-        btn.addEventListener("contextmenu", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (editMode) confirmDeleteMarker(marker.id);
-        });
-
-        // 手機長按刪除
-        btn.addEventListener("touchstart", (e) => {
-          if (!editMode) return;
-          longPressTimer = setTimeout(() => {
-            confirmDeleteMarker(marker.id);
-          }, 650);
-        }, { passive: true });
-
-        btn.addEventListener("touchmove", () => {
-          if (longPressTimer) clearTimeout(longPressTimer);
-        }, { passive: true });
-
-        btn.addEventListener("touchend", () => {
-          if (longPressTimer) clearTimeout(longPressTimer);
-          longPressTimer = null;
-        }, { passive: true });
-
-        stage.appendChild(btn);
-      });
-
-      const totalCount = getMarkerBucket().length;
-      $("markerCount").textContent = activeFilter === "all"
-        ? `目前地圖共有 ${totalCount} 個標記`
-        : `目前顯示 ${markers.length} / ${totalCount} 個標記`;
-      $("markerList").innerHTML = markers.map(marker => `
-        <button type="button" class="marker-item" onclick="openEditModal('${marker.id}')">
-          <div><strong>${marker.icon} ${escapeHtml(marker.name)}</strong></div>
-          <div class="small">標記者：${escapeHtml(marker.owner || "未命名")}${marker.note ? "｜" + escapeHtml(marker.note) : ""}</div>
-        </button>
-      `).join("");
-    }
-
-    function openCreateModal() {
-      editingMarkerId = null;
-      $("modalTitle").textContent = "新增標記";
-      $("markerName").value = "";
-      $("markerNote").value = "";
-      $("deleteBtn").style.display = "none";
-      const ownerInfo = $("markerOwnerInfo");
-      if (ownerInfo) ownerInfo.textContent = "標記者：將使用左側填寫的名字";
-      modal.style.display = "flex";
-    }
-
-    function openEditModal(id) {
-      const marker = getMarkerBucket().find(x => x.id === id);
-      if (!marker) return;
-      editingMarkerId = id;
-      $("modalTitle").textContent = "編輯標記";
-      $("markerName").value = marker.name;
-      $("markerNote").value = marker.note || "";
-      const ownerInfo = $("markerOwnerInfo");
-      if (ownerInfo) ownerInfo.textContent = "標記者：" + (marker.owner || "未命名");
-      $("deleteBtn").style.display = "block";
-      modal.style.display = "flex";
-    }
-
-    function closeModal() {
-      modal.style.display = "none";
-      editingMarkerId = null;
-      pendingPoint = null;
-    }
-
-    function saveMarker() {
-      if (!canEditMarkers(true)) return;
-      const name = $("markerName").value.trim();
-      if (!name) {
-        alert("請輸入名稱");
-        return;
-      }
-      const markers = getMarkerBucket();
-      if (editingMarkerId) {
-        const marker = markers.find(x => x.id === editingMarkerId);
-        if (!marker) return;
-        marker.name = name;
-        marker.note = $("markerNote").value.trim();
-        marker.updatedAt = Date.now();
-      } else {
-        const cfg = getGithubConfig();
-        if (!cfg.owner || !cfg.repo || !cfg.token) {
-          alert("請先填你的名字與 GitHub Token，並按「重新讀取標記」後才能標記。");
-          closeModal();
-          return;
-        }
-        const player = $("playerName").value.trim();
-        if (!player) {
-          alert("請先在左側填寫你的名字，才可以新增標記。");
-          closeModal();
-          $("playerName").focus();
-          return;
-        }
-        const icon = $("customIcon").value.trim() || selectedIcon;
-        markers.push({
-          id: crypto.randomUUID(),
-          xPct: pendingPoint.xPct,
-          yPct: pendingPoint.yPct,
-          icon,
-          name,
-          note: $("markerNote").value.trim(),
-          owner: player,
-          createdAt: Date.now(),
-        });
-      }
-      setMarkerBucket(markers);
-      renderMarkers();
-      closeModal();
-      pushToGithub("update markers");
-    }
-
-    function deleteMarker() {
-      if (!editingMarkerId) return;
-      const markers = getMarkerBucket().filter(x => x.id !== editingMarkerId);
-      setMarkerBucket(markers);
-      renderMarkers();
-      closeModal();
-      pushToGithub("delete marker");
-    }
-
-    function canEditMarkers(showAlert = true) {
-      const cfg = getGithubConfig();
-      const player = $("playerName")?.value?.trim() || "";
-
-      if (!player) {
-        if (showAlert) {
-          alert("要修改標記，請先填你的名字，這樣大家才知道是誰標記。");
-          $("playerName").focus();
-        }
-        return false;
-      }
-
-      if (!cfg.token) {
-        if (showAlert) {
-          alert("目前是觀看模式。要新增、移動、修改、刪除標記，請先填 GitHub Token。");
-          $("ghToken").focus();
-        }
-        return false;
-      }
-
-      return true;
-    }
-
-    function getGithubConfig() {
-      return {
-        owner: "BYwayJu",
-        repo: "gtav-map",
-        branch: "main",
-        path: "markers.json",
-        token: $("ghToken") ? $("ghToken").value.trim() : "",
-      };
-    }
-
-    function b64encodeUtf8(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
-
-    function b64decodeUtf8(str) {
-      return decodeURIComponent(escape(atob(str)));
-    }
-
-    async function loadFromGithub() {
-      const cfg = getGithubConfig();
-
-      try {
-        setStatus("讀取目前公開標記中...", "warn");
-
-        // 有 Token：用 GitHub API 讀取，可取得 SHA，之後可以寫入
-        if (cfg.token) {
-          const url = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
-          const res = await fetch(url, {
-            headers: {
-              Authorization: `Bearer ${cfg.token}`,
-              Accept: "application/vnd.github+json"
-            }
-          });
-          if (!res.ok) throw new Error(await res.text());
-
-          const data = await res.json();
-          githubSha = data.sha;
-
-          let raw = "{}";
-          try {
-            raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
-          } catch {}
-
-          let parsed = {};
-          try {
-            parsed = raw.trim() ? JSON.parse(raw) : {};
-          } catch {}
-
-          allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
-          renderMarkers();
-
-          const userName = $("playerName")?.value?.trim() || "未命名";
-          setStatus("已登入中：" + userName + "；可以新增/移動/修改/刪除標記", "ok");
-          return;
-        }
-
-        // 沒 Token：任何人都能讀取公開 markers.json，只能觀看
-        const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) throw new Error(await res.text());
-
-        const text = await res.text();
-        let parsed = {};
-        try {
-          parsed = text.trim() ? JSON.parse(text) : {};
-        } catch {}
-
-        allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
-        renderMarkers();
-
-        setStatus("已讀取目前公開標記；未填 Token 只能觀看", "ok");
-      } catch (err) {
-        console.error(err);
-        allMarkers = {};
-        renderMarkers();
-        setStatus("讀取公開標記失敗；目前先顯示空白標記", "warn");
-      }
-    }
-
-    async function pushToGithub(message) {
-      const cfg = getGithubConfig();
-      if (!canEditMarkers(true)) return;
-
-      try {
-        setStatus("同步到 GitHub 中...", "warn");
-
-        // 先讀最新 SHA，避免多人同時修改衝突
-        const getUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
-        const getRes = await fetch(getUrl, {
-          headers: {
-            Authorization: `Bearer ${cfg.token}`,
-            Accept: "application/vnd.github+json"
-          }
-        });
-        if (!getRes.ok) throw new Error(await getRes.text());
-
-        const current = await getRes.json();
-        githubSha = current.sha;
-
-        const putUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json`;
-        const body = {
-          message,
-          content: b64encodeUtf8(JSON.stringify(allMarkers, null, 2)),
-          branch: "main",
-          sha: githubSha
-        };
-
-        const putRes = await fetch(putUrl, {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${cfg.token}`,
-            Accept: "application/vnd.github+json"
-          },
-          body: JSON.stringify(body)
-        });
-
-        if (!putRes.ok) throw new Error(await putRes.text());
-
-        const putData = await putRes.json();
-        githubSha = putData.content.sha;
-        setStatus("已同步到 GitHub；所有人重新讀取後可看到", "ok");
-      } catch (err) {
-        console.error(err);
-        setStatus("同步失敗：請確認 Token 有 Contents Read and write 權限", "bad");
-        alert("同步失敗。請確認 Token 有 Contents Read and write 權限，且你有此 repo 權限。");
-        await loadFromGithub();
-      }
-    }
-
-    window.addEventListener("resize", resetView);
-
-    loadLocalData();
-    loadSettings();
-    updateModeButton();
-    const filterSelect = $("filterIcon");
-    if (filterSelect) filterSelect.value = activeFilter;
-    selectIcon(selectedIcon);
-    switchMap(activeMap);
-    setTimeout(() => loadFromGithub(), 500);
-    
-  </script>
+  <div class="card">
+    <b>如何取得 GitHub Token？</b>
+    <ol class="small" style="padding-left:18px">
+      <li>GitHub 頭像 → Settings。</li>
+      <li>Developer settings → Personal access tokens。</li>
+      <li>Fine-grained tokens → Generate new token。</li>
+      <li>Repository access 選 Only select repositories，選 gtav-map。</li>
+      <li>Repository permissions 選 Contents：Read and write。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div id="markerCount" class="small">目前地圖共有 0 個標記</div>
+    <div id="markerList" class="marker-list" style="margin-top:8px"></div>
+  </div>
+</aside>
+
+<main id="viewer" class="viewer">
+  <div id="topbar" class="topbar">
+    <button type="button" onclick="zoomBy(1.2)">＋</button>
+    <button type="button" onclick="zoomBy(0.83)">－</button>
+    <button type="button" onclick="resetView()">重置</button>
+  </div>
+  <div id="stage"><img id="mapImage" alt="map" draggable="false"></div>
+  <div class="hint">滿版地圖｜手機：單指拖曳、雙指縮放｜電腦：拖曳、滾輪縮放</div>
+</main>
+</div>
+
+<div id="markerModal" class="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle" style="margin-top:0">新增標記</h3>
+    <label>名稱</label>
+    <input id="markerName" placeholder="請輸入標記名稱">
+    <div id="markerOwnerInfo" class="small" style="margin-top:6px"></div>
+    <label>備註</label>
+    <textarea id="markerNote" placeholder="可填價格、用途、說明"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button type="button" onclick="saveMarker()">儲存</button>
+      <button type="button" class="muted-btn" onclick="closeModal()">取消</button>
+    </div>
+    <button id="deleteBtn" type="button" class="danger" style="margin-top:10px;display:none" onclick="deleteMarker()">刪除標記</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const viewer=$("viewer"),stage=$("stage"),mapImage=$("mapImage"),modal=$("markerModal"),topbar=$("topbar");
+let activeMap=localStorage.getItem("gtav_active_map")||"map-atlas.png";
+let selectedIcon=localStorage.getItem("gtav_selected_icon")||"🏠";
+let allMarkers={};
+let publicMarkers={};
+let editingMarkerId=null,pendingPoint=null,githubSha=null;
+let viewState={scale:1,x:0,y:0},imgSize={w:1,h:1},baseScale=1;
+let dragInfo={active:false,moved:false,x:0,y:0,blocked:false};
+let pinchInfo=null,movingMarkerId=null,movingMarkerMoved=false,suppressNextMarkerClick=false;
+let imageMaskCanvas=document.createElement("canvas"),imageMaskCtx=imageMaskCanvas.getContext("2d",{willReadFrequently:true}),bgColor=[0,0,0];
+
+["click","pointerdown","pointerup","mousedown","mouseup","touchstart","touchend"].forEach(evt=>topbar.addEventListener(evt,e=>e.stopPropagation(),{passive:false}));
+function setStatus(t,type="warn"){$("syncStatus").textContent=t;$("syncStatus").className="small "+(type==="ok"?"ok":type==="bad"?"bad":"warn");}
+function getLocalKey(){return "gtav_local_markers";}
+function getMarkerBucket(){return allMarkers[activeMap]||[]}
+function setMarkerBucket(list){allMarkers[activeMap]=list;saveLocalData()}
+function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMarkers));localStorage.setItem("gtav_active_map",activeMap);localStorage.setItem("gtav_selected_icon",selectedIcon)}
+function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
+function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
+function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null)$("playerName").value=n;if(t!==null)$("ghToken").value=t}
+function selectIcon(icon){selectedIcon=icon;$("iconSelect").value=icon;document.querySelectorAll(".icon-btn").forEach(b=>b.classList.toggle("active",b.textContent.includes(icon)));localStorage.setItem("gtav_selected_icon",icon)}
+function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
+mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
+function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
+function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.045,Math.min(.14,.055*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
+function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
+function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
+function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
+function isPointAllowed(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;if(x<0||x>imgSize.w||y<0||y>imgSize.h)return false;const d=imageMaskCtx.getImageData(Math.round(x),Math.round(y),1,1).data;const dist=Math.sqrt((d[0]-bgColor[0])**2+(d[1]-bgColor[1])**2+(d[2]-bgColor[2])**2);return dist>38}
+function isControlTarget(t){return !!t.closest("button,input,select,textarea,.topbar,.sidebar,.modal")}
+viewer.addEventListener("wheel",e=>{if(isControlTarget(e.target))return;e.preventDefault();const r=viewer.getBoundingClientRect();zoomAt(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+viewer.addEventListener("pointerdown",e=>{if(isControlTarget(e.target)||e.target.closest(".marker")||movingMarkerId){dragInfo.blocked=true;return}viewer.setPointerCapture(e.pointerId);dragInfo={active:true,moved:false,x:e.clientX,y:e.clientY,blocked:false}});
+viewer.addEventListener("pointermove",e=>{if(!dragInfo.active||dragInfo.blocked||pinchInfo)return;const dx=e.clientX-dragInfo.x,dy=e.clientY-dragInfo.y;if(Math.abs(dx)+Math.abs(dy)>4)dragInfo.moved=true;viewState.x+=dx;viewState.y+=dy;dragInfo.x=e.clientX;dragInfo.y=e.clientY;applyView()});
+viewer.addEventListener("pointerup",e=>{if(dragInfo.blocked||isControlTarget(e.target)||e.target.closest(".marker")){dragInfo.active=false;dragInfo.blocked=false;return}if(!dragInfo.active)return;dragInfo.active=false;if(!dragInfo.moved&&!pinchInfo){if(!$("playerName").value.trim()){alert("請先填你的名字");$("playerName").focus();return}if(!isPointAllowed(e.clientX,e.clientY))return;pendingPoint=screenToImage(e.clientX,e.clientY);openCreateModal()}});
+viewer.addEventListener("touchstart",e=>{if(isControlTarget(e.target))return;if(e.touches.length===2){e.preventDefault();dragInfo.active=false;dragInfo.blocked=true;const[a,b]=e.touches,r=viewer.getBoundingClientRect(),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;pinchInfo={dist:Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),scale:viewState.scale,imageX:(cx-viewState.x)/viewState.scale,imageY:(cy-viewState.y)/viewState.scale}}},{passive:false});
+viewer.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchInfo){e.preventDefault();const[a,b]=e.touches,r=viewer.getBoundingClientRect(),dist=Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,pinchInfo.scale*(dist/pinchInfo.dist)));viewState.x=cx-pinchInfo.imageX*viewState.scale;viewState.y=cy-pinchInfo.imageY*viewState.scale;applyView()}},{passive:false});
+viewer.addEventListener("touchend",()=>{pinchInfo=null;dragInfo.blocked=false});
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+function renderMarkers(){stage.querySelectorAll(".marker").forEach(e=>e.remove());const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.style.left=(marker.xPct*imgSize.w/100)+"px";btn.style.top=(marker.yPct*imgSize.h/100)+"px";btn.innerHTML=`${marker.icon}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span></span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});stage.appendChild(btn)});$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${m.icon} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
+window.addEventListener("pointermove",e=>{if(!movingMarkerId)return;e.preventDefault();movingMarkerMoved=true;const point=screenToImage(e.clientX,e.clientY),markers=getMarkerBucket(),m=markers.find(x=>x.id===movingMarkerId);if(!m)return;m.xPct=point.xPct;m.yPct=point.yPct;setMarkerBucket(markers);renderMarkers()},{passive:false});
+window.addEventListener("pointerup",()=>{if(!movingMarkerId)return;if(movingMarkerMoved){suppressNextMarkerClick=true;setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}movingMarkerId=null;movingMarkerMoved=false;setTimeout(()=>suppressNextMarkerClick=false,80)});
+function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();$("deleteBtn").style.display="none";modal.style.display="flex"}
+function openEditModal(id){const m=getMarkerBucket().find(x=>x.id===id);if(!m)return;editingMarkerId=id;$("modalTitle").textContent="編輯標記";$("markerName").value=m.name;$("markerNote").value=m.note||"";$("markerOwnerInfo").textContent="標記者："+(m.owner||"未命名");$("deleteBtn").style.display="block";modal.style.display="flex"}
+function closeModal(){modal.style.display="none";editingMarkerId=null;pendingPoint=null}
+function saveMarker(){const name=$("markerName").value.trim();if(!name){alert("請輸入名稱");return}const markers=getMarkerBucket();if(editingMarkerId){const m=markers.find(x=>x.id===editingMarkerId);if(!m)return;m.name=name;m.note=$("markerNote").value.trim();m.updatedAt=Date.now()}else{const icon=$("customIcon").value.trim()||selectedIcon;markers.push({id:crypto.randomUUID(),xPct:pendingPoint.xPct,yPct:pendingPoint.yPct,icon,name,note:$("markerNote").value.trim(),owner:$("playerName").value.trim(),createdAt:Date.now()})}setMarkerBucket(markers);renderMarkers();closeModal();setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}
+function deleteMarker(){if(!editingMarkerId)return;setMarkerBucket(getMarkerBucket().filter(x=>x.id!==editingMarkerId));renderMarkers();closeModal();setStatus("已在本機刪除；要公開請按「上傳同步」。","warn")}
+function b64encodeUtf8(str){return btoa(unescape(encodeURIComponent(str)))}
+function b64decodeUtf8(str){return decodeURIComponent(escape(atob(str)))}
+async function loadPublicMarkers(confirmOverwrite=false){try{if(confirmOverwrite&&Object.values(allMarkers).some(a=>Array.isArray(a)&&a.length>0)&&!confirm("重新讀取會覆蓋你目前本機標記，確定？"))return;setStatus("讀取公開標記中...","warn");const res=await fetch(`markers.json?v=${Date.now()}`,{cache:"no-store"});if(!res.ok)throw new Error(await res.text());const text=await res.text();const parsed=text.trim()?JSON.parse(text):{};allMarkers=Array.isArray(parsed)?{[activeMap]:parsed}:(parsed||{});saveLocalData();renderMarkers();setStatus("已讀取公開標記；你可以本機編輯，公開請按「上傳同步」。","ok")}catch(e){console.error(e);setStatus("讀取公開標記失敗；保留目前本機標記。","bad")}}
+async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限","bad");alert("上傳失敗：請確認 Token 有 Contents Read and write 權限")}}
+window.addEventListener("resize",resetView);
+loadLocalData();loadSettings();selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
+</script>
 </body>
 </html>
