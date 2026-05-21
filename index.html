@@ -133,8 +133,8 @@ pointer-events:auto;
 
   <div class="card">
     <label>GitHub Token（只有上傳同步才需要）</label>
-    <input id="ghToken" type="password" placeholder="要同步時貼 github_pat_ Token" />
-    <div class="small warn">不填 Token 也能看公開標記、也能本機標記；按「上傳同步」才需要 Token。</div>
+    <input id="ghToken" type="password" autocomplete="off" placeholder="第一次同步時貼 github_pat_ Token，之後會記住" />
+    <div class="small warn">不填 Token 也能看公開標記、也能本機標記；Token 會記住在這台裝置，之後上傳同步不用重貼。</div>
     <div class="row" style="margin-top:8px">
       <button type="button" onclick="saveSettings()">儲存設定</button>
       <button type="button" class="muted-btn" onclick="loadPublicMarkers(true)">重新讀取標記</button>
@@ -197,8 +197,21 @@ function getMarkerBucket(){return allMarkers[activeMap]||[]}
 function setMarkerBucket(list){allMarkers[activeMap]=list;saveLocalData()}
 function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMarkers));localStorage.setItem("gtav_active_map",activeMap);localStorage.setItem("gtav_selected_icon",selectedIcon)}
 function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
-function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
-function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null)$("playerName").value=n;if(t!==null)$("ghToken").value=t}
+function saveSettings(){
+  localStorage.setItem("gtav_playerName", $("playerName").value);
+  localStorage.setItem("gtav_ghToken", $("ghToken").value);
+  setStatus("設定已儲存。Token 已記住在這台裝置；之後按「上傳同步」不用重貼。", "ok");
+}
+function loadSettings(){
+  const n = localStorage.getItem("gtav_playerName");
+  const t = localStorage.getItem("gtav_ghToken");
+  if (n !== null) $("playerName").value = n;
+  if (t !== null) $("ghToken").value = t;
+
+  if (t) {
+    setStatus("Token 已從這台裝置載入；按「上傳同步」不用重貼。", "ok");
+  }
+}
 function renderIconGrid(filterName){const name=filterName||localStorage.getItem("gtav_icon_filter")||"all";localStorage.setItem("gtav_icon_filter",name);$("iconFilterSelect").value=name;const list=ICON_GROUPS[name]||ICON_GROUPS.all;$("iconGrid").innerHTML=list.map(([icon,label])=>`<button type="button" class="icon-btn" data-icon="${icon}" onclick="selectIcon('${icon}')" title="${label}">${iconMarkup(icon)}<span>${label}</span></button>`).join("");updateIconActiveState()}
 function updateIconActiveState(){document.querySelectorAll(".icon-btn").forEach(b=>b.classList.toggle("active",(b.getAttribute("data-icon")||"")===selectedIcon))}
 function selectIcon(icon){selectedIcon=icon;localStorage.setItem("gtav_selected_icon",icon);updateIconActiveState();setStatus("目前選擇圖案，點地圖即可新增。","ok")}
@@ -233,7 +246,23 @@ function b64encodeUtf8(str){return btoa(unescape(encodeURIComponent(str)))}
 async function loadPublicMarkers(confirmOverwrite=false){try{if(confirmOverwrite&&Object.values(allMarkers).some(a=>Array.isArray(a)&&a.length>0)&&!confirm("重新讀取會覆蓋你目前本機標記，確定？"))return;setStatus("讀取公開標記中...","warn");const res=await fetch(`markers.json?v=${Date.now()}`,{cache:"no-store"});if(!res.ok)throw new Error(await res.text());const text=await res.text();const parsed=text.trim()?JSON.parse(text):{};allMarkers=Array.isArray(parsed)?{[activeMap]:parsed}:(parsed||{});saveLocalData();renderMarkers();setStatus("已讀取公開標記；你可以本機編輯，公開請按「上傳同步」。","ok")}catch(e){console.error(e);setStatus("讀取公開標記失敗；保留目前本機標記。","bad")}}
 async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限","bad");alert("上傳失敗：請確認 Token 有 Contents Read and write 權限")}}
 window.addEventListener("resize",resetView);
-loadLocalData();loadSettings();renderIconGrid(localStorage.getItem("gtav_icon_filter")||"all");selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
+loadLocalData();
+loadSettings();
+
+$("playerName").addEventListener("input", () => {
+  localStorage.setItem("gtav_playerName", $("playerName").value);
+});
+$("ghToken").addEventListener("input", () => {
+  localStorage.setItem("gtav_ghToken", $("ghToken").value);
+  if ($("ghToken").value.trim()) {
+    setStatus("Token 已自動記住在這台裝置。", "ok");
+  }
+});
+
+renderIconGrid(localStorage.getItem("gtav_icon_filter") || "all");
+selectIcon(selectedIcon);
+switchMap(activeMap);
+setTimeout(() => loadPublicMarkers(false), 500);
 </script>
 </body>
 </html>
