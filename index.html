@@ -15,132 +15,78 @@ html,body{margin:0;height:100%;font-family:system-ui,-apple-system,"Noto Sans TC
 .subtitle{font-size:16px;color:#c7d2fe;line-height:1.65}
 label{display:block;font-size:17px;font-weight:700;margin:10px 0 5px;color:#dbeafe}
 input,select,textarea,button{width:100%;border-radius:12px;border:1px solid #334155;background:#111c31;color:#fff;padding:12px 14px;font-size:17px}
-textarea{min-height:90px;resize:vertical}
 button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
-.muted-btn{background:#334155}
-.danger{background:#991b1b}
-.row{display:flex;gap:8px}
-.row>*{flex:1}
-.small{font-size:15px;color:#dbeafe;line-height:1.75}
-.warn{color:#fde68a}
-.ok{color:#86efac}
-.bad{color:#fca5a5}
+textarea{min-height:88px;resize:vertical}
+.row{display:flex;gap:8px} .row>*{flex:1}
+.muted-btn{background:#334155} .danger{background:#991b1b}
+.small{font-size:15px;color:#dbeafe;line-height:1.75} .warn{color:#fde68a} .ok{color:#86efac} .bad{color:#fca5a5}
 .icon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-height:260px;overflow:auto;margin-top:8px}
-.icon-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:62px;font-size:20px;background:#1e293b;border:1px solid #334155;padding:8px 6px}
+.icon-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;font-size:20px;background:#1e293b;border:1px solid #334155;padding:8px 6px}
 .icon-btn span{font-size:13px;line-height:1.2;color:#d1d5db;font-weight:500}
-.icon-btn.active{outline:2px solid #22d3ee;background:#0e7490}
-.topbar{position:absolute;top:12px;right:12px;z-index:10;display:flex;gap:8px}
+.icon-btn.active{outline:3px solid #22d3ee!important;background:#0e7490!important;box-shadow:0 0 0 3px rgba(34,211,238,.25)!important}
+.topbar{position:absolute;top:12px;right:12px;z-index:30;display:flex;gap:8px}
 .topbar button{width:auto;min-width:44px;padding:10px 12px;background:rgba(15,23,42,.92);border:1px solid #334155}
-.hint{position:absolute;left:12px;bottom:12px;z-index:10;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
+.hint{position:absolute;left:12px;bottom:12px;z-index:30;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #stage img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
+#markerLayer{position:absolute;inset:0;z-index:20;pointer-events:none}
 .marker{
-  position:absolute;
-  transform:translate(-50%,-50%) scale(var(--marker-scale,1));
-  transform-origin:center center;
-  background:transparent;
-  border:none;
-  padding:0;
-  cursor:grab;
-  line-height:1;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.95));
-  width:auto;
-  min-width:24px;
-  min-height:24px;
-  touch-action:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+position:absolute;
+transform:translate(-50%,-50%);
+background:transparent;
+border:none;
+padding:0;
+width:30px;
+height:30px;
+cursor:grab;
+filter:none;
+pointer-events:auto;
 }
-.marker:active{cursor:grabbing}
-.marker-label{
-  display:none;
-  position:absolute;
-  left:50%;
-  top:100%;
-  margin-top:5px;
-  white-space:nowrap;
-  border-radius:6px;
-  background:rgba(0,0,0,.82);
-  border:1px solid rgba(255,255,255,.16);
-  padding:4px 7px;
-  transform:translateX(-50%);
-  text-align:center;
-  line-height:1.25;
-  z-index:999;
-  box-shadow:0 2px 6px rgba(0,0,0,.55);
-}
+.marker svg{width:30px;height:30px;display:block}
+.marker-label{display:none;position:absolute;left:50%;top:100%;margin-top:5px;white-space:nowrap;border-radius:6px;background:rgba(0,0,0,.86);border:1px solid rgba(255,255,255,.16);padding:4px 7px;transform:translateX(-50%);text-align:center;line-height:1.3;z-index:999;box-shadow:0 2px 6px rgba(0,0,0,.55)}
 .marker:hover .marker-label,.marker:focus .marker-label{display:block}
-.marker-name{
-  display:block;
-  font-weight:800;
-  font-size:13px;
-  color:#fff;
-}
-.marker-owner{
-  display:block;
-  font-size:11px;
-  color:#facc15;
-  margin-top:1px;
-  font-weight:700;
-}
+.marker-name{display:block;font-weight:800;font-size:13px;color:#fff} .marker-owner{display:block;font-size:11px;color:#facc15;margin-top:1px;font-weight:700}
+
+.icon-btn 
 .marker-list{display:flex;flex-direction:column;gap:8px}
 .marker-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;text-align:left}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
 .modal-box{width:min(440px,100%);background:#111827;border:1px solid #334155;border-radius:18px;padding:18px}
 @media(max-width:900px){
   .app{grid-template-columns:1fr;grid-template-rows:52vh 48vh}
   .sidebar{order:1;max-height:52vh;border-right:none;border-bottom:1px solid #263247;font-size:16px}
   .viewer{order:2}
   input,select,textarea,button{font-size:16px;padding:12px 14px}
-  label{font-size:16px}
-  .small{font-size:14px}
-  .icon-grid{grid-template-columns:repeat(3,1fr);max-height:220px}
+  label{font-size:16px} .small{font-size:14px} .icon-grid{grid-template-columns:repeat(3,1fr);max-height:220px}
 }
 
-/* icon filter + direct icon selection */
-.icon-btn.active,.iconBtn.active{
-  outline:3px solid #22d3ee!important;
-  background:#0e7490!important;
-  box-shadow:0 0 0 3px rgba(34,211,238,.25)!important;
-}
-.icon-btn:active,.iconBtn:active{transform:scale(.97)}
-
-
-/* crisp vector marker icons */
-.svg-icon{
-  width:28px;
-  height:28px;
-  display:inline-block;
-  vertical-align:middle;
-}
-.marker .svg-icon{
-  width:28px;
-  height:28px;
-  display:block;
-}
-.icon-btn .svg-icon{
-  width:32px;
-  height:32px;
-  margin-bottom:4px;
-}
-.marker{
-  position:absolute;
-  transform:translate(-50%,-50%) scale(var(--marker-scale,1));
-  transform-origin:center center;
-  background:transparent;
-  border:none;
-  padding:0;
-  cursor:grab;
-  line-height:1;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.95));
-  width:auto;
-  min-width:24px;
-  min-height:24px;
-  touch-action:none;
-  display:flex;
+/* Emoji marker icons */
+.emoji-icon{
+  display:inline-flex;
   align-items:center;
   justify-content:center;
+  width:30px;
+  height:30px;
+  font-size:22px;
+  line-height:1;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000,
+     0 2px 4px rgba(0,0,0,.8);
+}
+.marker .emoji-icon{
+  width:30px;
+  height:30px;
+  font-size:22px;
+}
+.icon-btn .emoji-icon{
+  width:32px;
+  height:32px;
+  font-size:24px;
+  margin-bottom:4px;
 }
 
 </style>
@@ -149,7 +95,7 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 <div class="app">
 <aside class="sidebar">
   <div class="title">GTAV 私人地圖</div>
-  <div class="subtitle">所有人打開都能看到公開標記；新增/修改/刪除會先存在自己本機，按「上傳同步」才公開給大家。</div>
+  <div class="subtitle">所有人都能看公開標記；你可以本機編輯，按「上傳同步」才公開給大家。</div>
 
   <div class="card">
     <label>地圖樣式</label>
@@ -168,23 +114,21 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   <div class="card">
     <label>你的名字（會顯示誰標記）</label>
     <input id="playerName" placeholder="例如 BYWAY" />
+
     <label>圖案篩選</label>
     <select id="iconFilterSelect" onchange="renderIconGrid(this.value)">
-      
-<option value="all">全部圖案</option>
-<option value="work">工作 / 產業</option>
-<option value="fish">漁業 / 釣魚</option>
-<option value="shop">商店 / 服務</option>
-<option value="public">公共設施</option>
-<option value="custom">常用 / 自訂</option>
-
+      <option value="all">全部圖案</option>
+      <option value="work">工作 / 產業</option>
+      <option value="fish">漁業 / 釣魚</option>
+      <option value="shop">商店 / 服務</option>
+      <option value="public">公共設施</option>
+      <option value="custom">常用 / 自訂</option>
     </select>
-    <div class="small warn">上方只是篩選分類，不會直接選圖案；下面顯示該分類圖案，點下面圖案才會切換目前要新增的圖標。</div>
+    <div class="small warn">上方只是篩選分類；下面點圖案才會切換目前標記圖示。</div>
     <div id="iconGrid" class="icon-grid"></div>
 
-<label>自訂圖示（可留空）</label>
+    <label>自訂圖示（可留空）</label>
     <input id="customIcon" placeholder="例如 💰" />
-    <div class="small">點地圖新增標記；按住標記可拖曳移動；點標記可編輯。</div>
   </div>
 
   <div class="card">
@@ -200,17 +144,6 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   </div>
 
   <div class="card">
-    <b>如何取得 GitHub Token？</b>
-    <ol class="small" style="padding-left:18px">
-      <li>GitHub 頭像 → Settings。</li>
-      <li>Developer settings → Personal access tokens。</li>
-      <li>Fine-grained tokens → Generate new token。</li>
-      <li>Repository access 選 Only select repositories，選 gtav-map。</li>
-      <li>Repository permissions 選 Contents：Read and write。</li>
-    </ol>
-  </div>
-
-  <div class="card">
     <div id="markerCount" class="small">目前地圖共有 0 個標記</div>
     <div id="markerList" class="marker-list" style="margin-top:8px"></div>
   </div>
@@ -223,18 +156,17 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
     <button type="button" onclick="resetView()">重置</button>
   </div>
   <div id="stage"><img id="mapImage" alt="map" draggable="false"></div>
-  <div class="hint">GTA風格圖示｜縮放時圖示維持固定大小｜手機：單指拖曳、雙指縮放</div>
+  <div id="markerLayer"></div>
+  <div class="hint">清晰圖示層｜圖示不跟地圖一起變糊｜手機：單指拖曳、雙指縮放</div>
 </main>
 </div>
 
 <div id="markerModal" class="modal">
   <div class="modal-box">
     <h3 id="modalTitle" style="margin-top:0">新增標記</h3>
-    <label>名稱</label>
-    <input id="markerName" placeholder="請輸入標記名稱">
+    <label>名稱</label><input id="markerName" placeholder="請輸入標記名稱">
     <div id="markerOwnerInfo" class="small" style="margin-top:6px"></div>
-    <label>備註</label>
-    <textarea id="markerNote" placeholder="可填價格、用途、說明"></textarea>
+    <label>備註</label><textarea id="markerNote" placeholder="可填價格、用途、說明"></textarea>
     <div class="row" style="margin-top:10px">
       <button type="button" onclick="saveMarker()">儲存</button>
       <button type="button" class="muted-btn" onclick="closeModal()">取消</button>
@@ -244,112 +176,42 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 </div>
 
 <script>
+const ICON_GROUPS = {"all": [["🏠", "房子"], ["💎", "鑽石"], ["🐟", "魚"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🪓", "伐木中心"], ["🎣", "漁業中心"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🚜", "農場管理員"], ["🪝", "釣魚佈告欄"], ["🪵", "鋸木廠"], ["🧭", "導航點"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🛒", "商店"], ["🏥", "醫院"], ["🛡️", "警局"], ["🏛️", "市政廳"], ["🔧", "機械師"], ["🔫", "武器商人"], ["⚡", "電力維修工"], ["🏨", "飯店"], ["📍", "一般標記"]], "work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"]], "shop": [["🛒", "商店"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["💰", "錢袋"], ["⭐", "自訂"]]};
 const $=id=>document.getElementById(id);
-const viewer=$("viewer"),stage=$("stage"),mapImage=$("mapImage"),modal=$("markerModal"),topbar=$("topbar");
+const viewer=$("viewer"),stage=$("stage"),mapImage=$("mapImage"),markerLayer=$("markerLayer"),modal=$("markerModal"),topbar=$("topbar");
 let activeMap=localStorage.getItem("gtav_active_map")||"map-atlas.png";
 let selectedIcon=localStorage.getItem("gtav_selected_icon")||"🏠";
-let allMarkers={};
-let publicMarkers={};
-let editingMarkerId=null,pendingPoint=null,githubSha=null;
-let viewState={scale:1,x:0,y:0},imgSize={w:1,h:1},baseScale=1;
+let allMarkers={}, editingMarkerId=null, pendingPoint=null, githubSha=null;
+let viewState={scale:1,x:0,y:0}, imgSize={w:1,h:1}, baseScale=1;
 let dragInfo={active:false,moved:false,x:0,y:0,blocked:false};
-let pinchInfo=null,movingMarkerId=null,movingMarkerMoved=false,suppressNextMarkerClick=false;
-let imageMaskCanvas=document.createElement("canvas"),imageMaskCtx=imageMaskCanvas.getContext("2d",{willReadFrequently:true}),bgColor=[0,0,0];
+let pinchInfo=null, movingMarkerId=null, movingMarkerMoved=false, suppressNextMarkerClick=false;
+let imageMaskCanvas=document.createElement("canvas"), imageMaskCtx=imageMaskCanvas.getContext("2d",{willReadFrequently:true}), bgColor=[0,0,0];
 
-["click","pointerdown","pointerup","mousedown","mouseup","touchstart","touchend"].forEach(evt=>topbar.addEventListener(evt,e=>e.stopPropagation(),{passive:false}));
-function setStatus(t,type="warn"){$("syncStatus").textContent=t;$("syncStatus").className="small "+(type==="ok"?"ok":type==="bad"?"bad":"warn");}
-function getLocalKey(){return "gtav_local_markers";}
+function iconMarkup(icon){
+  return `<span class="emoji-icon">${icon}</span>`;
+}
+
+function setStatus(t,type="warn"){$("syncStatus").textContent=t;$("syncStatus").className="small "+(type==="ok"?"ok":type==="bad"?"bad":"warn")}
+function getLocalKey(){return"gtav_local_markers_v2"}
 function getMarkerBucket(){return allMarkers[activeMap]||[]}
 function setMarkerBucket(list){allMarkers[activeMap]=list;saveLocalData()}
 function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMarkers));localStorage.setItem("gtav_active_map",activeMap);localStorage.setItem("gtav_selected_icon",selectedIcon)}
 function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
 function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
 function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null)$("playerName").value=n;if(t!==null)$("ghToken").value=t}
-const ICON_GROUPS = {"all": [["🏠", "房子"], ["💎", "鑽石"], ["🐟", "魚"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🪓", "伐木中心"], ["🎣", "漁業中心"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🚜", "農場管理員"], ["🪝", "釣魚佈告欄"], ["🪵", "鋸木廠"], ["🧭", "導航點"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🛒", "商店"], ["🏥", "醫院"], ["🛡️", "警局"], ["🏛️", "市政廳"], ["🔧", "機械師"], ["🔫", "武器商人"], ["⚡", "電力維修工"], ["🏨", "飯店"], ["📍", "一般標記"]], "work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"]], "shop": [["🛒", "商店"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["💰", "錢袋"], ["⭐", "自訂"]]};
-
-function iconMarkup(icon){
-  const map = {
-    "🏠": ["#38bdf8","M4 14 L14 5 L24 14 V26 H17 V18 H11 V26 H4 Z"],
-    "💎": ["#22d3ee","M14 3 L25 10 L14 27 L3 10 Z M7 10 H21 M10 10 L14 27 M18 10 L14 27"],
-    "🐟": ["#38bdf8","M5 15 C9 8 18 8 23 15 C18 22 9 22 5 15 Z M23 15 L29 10 V20 Z"],
-    "📄": ["#e5e7eb","M7 3 H19 L25 9 V29 H7 Z M19 3 V10 H25 M11 15 H21 M11 20 H21"],
-    "📱": ["#60a5fa","M9 2 H23 A2 2 0 0 1 25 4 V28 A2 2 0 0 1 23 30 H9 A2 2 0 0 1 7 28 V4 A2 2 0 0 1 9 2 Z M13 26 H19"],
-    "🏭": ["#f97316","M3 27 H29 V12 L22 16 V12 L15 16 V12 L8 16 V7 H3 Z M7 21 H11 M14 21 H18 M21 21 H25"],
-    "🪓": ["#f59e0b","M5 26 L22 9 M20 5 L28 10 L24 16 L17 11 Z"],
-    "🎣": ["#60a5fa","M10 4 C22 8 24 20 16 25 C11 28 7 24 10 20 M10 4 C8 12 9 18 13 21"],
-    "⛏️": ["#facc15","M7 25 L23 9 M10 6 C16 2 23 4 28 10 M12 6 L26 20"],
-    "💠": ["#06b6d4","M14 3 L25 14 L14 29 L3 14 Z M14 8 L20 14 L14 24 L8 14 Z"],
-    "🚜": ["#22c55e","M4 22 A5 5 0 1 0 14 22 A5 5 0 1 0 4 22 M20 24 A3 3 0 1 0 26 24 A3 3 0 1 0 20 24 M9 17 H18 L15 9 H10 Z M17 17 H25 V21 H18"],
-    "🪝": ["#38bdf8","M18 3 V19 C18 27 8 27 8 19 C8 15 12 15 12 19"],
-    "🪵": ["#a16207","M5 19 C7 10 20 6 27 11 C25 20 13 25 5 19 Z M9 19 C12 18 14 16 15 13"],
-    "🧭": ["#f97316","M16 3 A13 13 0 1 0 16 29 A13 13 0 1 0 16 3 M20 10 L17 19 L11 22 L14 13 Z"],
-    "🚗": ["#ef4444","M5 20 H27 L24 13 H8 Z M8 23 A3 3 0 1 0 14 23 A3 3 0 1 0 8 23 M20 23 A3 3 0 1 0 26 23 A3 3 0 1 0 20 23"],
-    "🅿️": ["#2563eb","M6 4 H26 V28 H6 Z M12 23 V9 H18 C25 9 25 18 18 18 H12 M12 9 H18"],
-    "🛒": ["#f97316","M5 6 H9 L12 20 H25 L28 10 H11 M13 25 A2 2 0 1 0 17 25 A2 2 0 1 0 13 25 M23 25 A2 2 0 1 0 27 25 A2 2 0 1 0 23 25"],
-    "🏥": ["#ef4444","M5 8 H27 V28 H5 Z M14 12 H18 V17 H23 V21 H18 V26 H14 V21 H9 V17 H14 Z"],
-    "🛡️": ["#38bdf8","M16 3 L27 7 V15 C27 23 21 28 16 30 C11 28 5 23 5 15 V7 Z"],
-    "🏛️": ["#e5e7eb","M4 12 H28 L16 4 Z M7 14 H10 V25 H7 Z M14 14 H17 V25 H14 Z M22 14 H25 V25 H22 Z M5 27 H27"],
-    "🔧": ["#cbd5e1","M22 4 C26 8 26 14 22 18 L13 27 L8 22 L17 13 C15 9 18 5 22 4 Z"],
-    "🔫": ["#22c55e","M4 13 H22 L27 16 V20 H18 L15 27 H10 L13 20 H4 Z"],
-    "⚡": ["#facc15","M18 2 L7 18 H15 L12 30 L25 12 H17 Z"],
-    "🏨": ["#f43f5e","M6 5 H26 V29 H6 Z M11 10 H14 M18 10 H21 M11 15 H14 M18 15 H21 M11 20 H14 M18 20 H21"],
-    "📍": ["#ef4444","M16 2 C10 2 6 6 6 12 C6 21 16 30 16 30 C16 30 26 21 26 12 C26 6 22 2 16 2 Z M16 8 A4 4 0 1 0 16 16 A4 4 0 1 0 16 8"],
-    "💰": ["#facc15","M10 10 C6 14 5 19 6 24 C8 30 24 30 26 24 C27 19 26 14 22 10 Z M12 4 H20 L18 10 H14 Z M16 14 V25 M12 17 C12 14 20 14 20 17 C20 20 12 19 12 22 C12 25 20 25 20 22"],
-    "⭐": ["#facc15","M16 3 L20 12 L30 12 L22 18 L25 28 L16 22 L7 28 L10 18 L2 12 L12 12 Z"]
-  };
-  const item = map[icon] || ["#94a3b8","M16 3 A13 13 0 1 0 16 29 A13 13 0 1 0 16 3"];
-  const color = item[0];
-  const path = item[1];
-  return `<svg class="svg-icon" viewBox="0 0 32 32" aria-hidden="true">
-    <circle cx="16" cy="16" r="15" fill="white" stroke="black" stroke-width="2.1"/>
-    <path d="${path}" fill="${color}" stroke="black" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
-  </svg>`;
-}
-
-function renderIconGrid(filterName){
-  const groupName = filterName || localStorage.getItem("gtav_icon_filter") || "all";
-  localStorage.setItem("gtav_icon_filter", groupName);
-
-  const select = $("iconFilterSelect");
-  if (select) select.value = groupName;
-
-  const grid = $("iconGrid");
-  if (!grid) return;
-
-  const list = ICON_GROUPS[groupName] || ICON_GROUPS.all;
-  grid.innerHTML = list.map(([icon, name]) => `
-    <button type="button" class="icon-btn" data-icon="${icon}" onclick="selectIcon('${icon}')" title="${name}">
-      ${iconMarkup(icon)}<span>${name}</span>
-    </button>
-  `).join("");
-
-  updateIconActiveState();
-}
-
-function updateIconActiveState(){
-  document.querySelectorAll(".icon-btn,.iconBtn").forEach(btn => {
-    const btnIcon = btn.getAttribute("data-icon") || "";
-    btn.classList.toggle("active", btnIcon === selectedIcon);
-  });
-}
-
-function selectIcon(icon){
-  selectedIcon = icon;
-  localStorage.setItem("gtav_selected_icon", icon);
-  updateIconActiveState();
-  setStatus("目前選擇圖案：" + icon + "，點地圖即可新增這個圖標。", "ok");
-}
-
+function renderIconGrid(filterName){const name=filterName||localStorage.getItem("gtav_icon_filter")||"all";localStorage.setItem("gtav_icon_filter",name);$("iconFilterSelect").value=name;const list=ICON_GROUPS[name]||ICON_GROUPS.all;$("iconGrid").innerHTML=list.map(([icon,label])=>`<button type="button" class="icon-btn" data-icon="${icon}" onclick="selectIcon('${icon}')" title="${label}">${iconMarkup(icon)}<span>${label}</span></button>`).join("");updateIconActiveState()}
+function updateIconActiveState(){document.querySelectorAll(".icon-btn").forEach(b=>b.classList.toggle("active",(b.getAttribute("data-icon")||"")===selectedIcon))}
+function selectIcon(icon){selectedIcon=icon;localStorage.setItem("gtav_selected_icon",icon);updateIconActiveState();setStatus("目前選擇圖案，點地圖即可新增。","ok")}
 function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
-mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
-function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
+mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function s(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[s(5,5),s(imgSize.w-6,5),s(5,imgSize.h-6),s(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((a,b)=>a+b[i],0)/4));resetView();renderMarkers()};
+function resetView(){const r=viewer.getBoundingClientRect(),sc=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=sc;baseScale=sc;viewState.x=(r.width-imgSize.w*sc)/2;viewState.y=(r.height-imgSize.h*sc)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
-function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds = 0.70; stage.style.setProperty("--marker-scale", String(ds / viewState.scale))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;positionMarkers()}
 function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
 function isPointAllowed(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;if(x<0||x>imgSize.w||y<0||y>imgSize.h)return false;const d=imageMaskCtx.getImageData(Math.round(x),Math.round(y),1,1).data;const dist=Math.sqrt((d[0]-bgColor[0])**2+(d[1]-bgColor[1])**2+(d[2]-bgColor[2])**2);return dist>38}
-function isControlTarget(t){return !!t.closest("button,input,select,textarea,.topbar,.sidebar,.modal")}
+function isControlTarget(t){return!!t.closest("button,input,select,textarea,.topbar,.sidebar,.modal")}
 viewer.addEventListener("wheel",e=>{if(isControlTarget(e.target))return;e.preventDefault();const r=viewer.getBoundingClientRect();zoomAt(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
 viewer.addEventListener("pointerdown",e=>{if(isControlTarget(e.target)||e.target.closest(".marker")||movingMarkerId){dragInfo.blocked=true;return}viewer.setPointerCapture(e.pointerId);dragInfo={active:true,moved:false,x:e.clientX,y:e.clientY,blocked:false}});
 viewer.addEventListener("pointermove",e=>{if(!dragInfo.active||dragInfo.blocked||pinchInfo)return;const dx=e.clientX-dragInfo.x,dy=e.clientY-dragInfo.y;if(Math.abs(dx)+Math.abs(dy)>4)dragInfo.moved=true;viewState.x+=dx;viewState.y+=dy;dragInfo.x=e.clientX;dragInfo.y=e.clientY;applyView()});
@@ -358,21 +220,20 @@ viewer.addEventListener("touchstart",e=>{if(isControlTarget(e.target))return;if(
 viewer.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchInfo){e.preventDefault();const[a,b]=e.touches,r=viewer.getBoundingClientRect(),dist=Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,pinchInfo.scale*(dist/pinchInfo.dist)));viewState.x=cx-pinchInfo.imageX*viewState.scale;viewState.y=cy-pinchInfo.imageY*viewState.scale;applyView()}},{passive:false});
 viewer.addEventListener("touchend",()=>{pinchInfo=null;dragInfo.blocked=false});
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
-function renderMarkers(){stage.querySelectorAll(".marker").forEach(e=>e.remove());const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.style.left=(marker.xPct*imgSize.w/100)+"px";btn.style.top=(marker.yPct*imgSize.h/100)+"px";btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span></span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});stage.appendChild(btn)});$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${iconMarkup(m.icon)} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
+function positionMarkers(){document.querySelectorAll(".marker").forEach(btn=>{const x=Number(btn.dataset.xpct)*imgSize.w*viewState.scale/100+viewState.x;const y=Number(btn.dataset.ypct)*imgSize.h*viewState.scale/100+viewState.y;btn.style.left=x+"px";btn.style.top=y+"px"})}
+function renderMarkers(){markerLayer.innerHTML="";const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.dataset.id=marker.id;btn.dataset.xpct=marker.xPct;btn.dataset.ypct=marker.yPct;btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span></span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});markerLayer.appendChild(btn)});positionMarkers();$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${iconMarkup(m.icon)} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
 window.addEventListener("pointermove",e=>{if(!movingMarkerId)return;e.preventDefault();movingMarkerMoved=true;const point=screenToImage(e.clientX,e.clientY),markers=getMarkerBucket(),m=markers.find(x=>x.id===movingMarkerId);if(!m)return;m.xPct=point.xPct;m.yPct=point.yPct;setMarkerBucket(markers);renderMarkers()},{passive:false});
-window.addEventListener("pointerup",()=>{if(!movingMarkerId)return;if(movingMarkerMoved){suppressNextMarkerClick=true;setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}movingMarkerId=null;movingMarkerMoved=false;setTimeout(()=>suppressNextMarkerClick=false,80)});
+window.addEventListener("pointerup",()=>{if(!movingMarkerId)return;if(movingMarkerMoved){suppressNextMarkerClick=true;setStatus("已移動標記並存在本機；要公開請按「上傳同步」。","warn")}movingMarkerId=null;movingMarkerMoved=false;setTimeout(()=>suppressNextMarkerClick=false,80)});
 function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();$("deleteBtn").style.display="none";modal.style.display="flex"}
 function openEditModal(id){const m=getMarkerBucket().find(x=>x.id===id);if(!m)return;editingMarkerId=id;$("modalTitle").textContent="編輯標記";$("markerName").value=m.name;$("markerNote").value=m.note||"";$("markerOwnerInfo").textContent="標記者："+(m.owner||"未命名");$("deleteBtn").style.display="block";modal.style.display="flex"}
 function closeModal(){modal.style.display="none";editingMarkerId=null;pendingPoint=null}
 function saveMarker(){const name=$("markerName").value.trim();if(!name){alert("請輸入名稱");return}const markers=getMarkerBucket();if(editingMarkerId){const m=markers.find(x=>x.id===editingMarkerId);if(!m)return;m.name=name;m.note=$("markerNote").value.trim();m.updatedAt=Date.now()}else{const icon=$("customIcon").value.trim()||selectedIcon;markers.push({id:crypto.randomUUID(),xPct:pendingPoint.xPct,yPct:pendingPoint.yPct,icon,name,note:$("markerNote").value.trim(),owner:$("playerName").value.trim(),createdAt:Date.now()})}setMarkerBucket(markers);renderMarkers();closeModal();setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}
 function deleteMarker(){if(!editingMarkerId)return;setMarkerBucket(getMarkerBucket().filter(x=>x.id!==editingMarkerId));renderMarkers();closeModal();setStatus("已在本機刪除；要公開請按「上傳同步」。","warn")}
 function b64encodeUtf8(str){return btoa(unescape(encodeURIComponent(str)))}
-function b64decodeUtf8(str){return decodeURIComponent(escape(atob(str)))}
 async function loadPublicMarkers(confirmOverwrite=false){try{if(confirmOverwrite&&Object.values(allMarkers).some(a=>Array.isArray(a)&&a.length>0)&&!confirm("重新讀取會覆蓋你目前本機標記，確定？"))return;setStatus("讀取公開標記中...","warn");const res=await fetch(`markers.json?v=${Date.now()}`,{cache:"no-store"});if(!res.ok)throw new Error(await res.text());const text=await res.text();const parsed=text.trim()?JSON.parse(text):{};allMarkers=Array.isArray(parsed)?{[activeMap]:parsed}:(parsed||{});saveLocalData();renderMarkers();setStatus("已讀取公開標記；你可以本機編輯，公開請按「上傳同步」。","ok")}catch(e){console.error(e);setStatus("讀取公開標記失敗；保留目前本機標記。","bad")}}
 async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限","bad");alert("上傳失敗：請確認 Token 有 Contents Read and write 權限")}}
 window.addEventListener("resize",resetView);
-loadLocalData();loadSettings();renderIconGrid(localStorage.getItem('gtav_icon_filter') || 'all');
-selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
+loadLocalData();loadSettings();renderIconGrid(localStorage.getItem("gtav_icon_filter")||"all");selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
 </script>
 </body>
 </html>
