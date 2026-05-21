@@ -34,10 +34,59 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 .hint{position:absolute;left:12px;bottom:12px;z-index:10;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #stage img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
-.marker{position:absolute;transform:translate(-50%,-100%) scale(var(--marker-scale,1));transform-origin:center bottom;background:transparent;border:none;padding:0;cursor:grab;font-size:14px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));width:auto;touch-action:none}
+.marker{
+  position:absolute;
+  transform:translate(-50%,-100%) scale(var(--marker-scale,1));
+  transform-origin:center bottom;
+  background:rgba(255,255,255,.92);
+  border:2px solid rgba(0,0,0,.85);
+  border-radius:999px;
+  padding:3px;
+  cursor:grab;
+  font-size:22px!important;
+  line-height:1;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.95));
+  width:auto;
+  min-width:28px;
+  min-height:28px;
+  touch-action:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 .marker:active{cursor:grabbing}
-.marker-label{display:none;margin-top:2px;white-space:nowrap;border-radius:10px;background:rgba(15,23,42,.92);border:1px solid #334155;padding:4px 8px;transform:translateX(-32%);text-align:center;line-height:1.25}
-.marker:hover .marker-label,.marker:focus .marker-label{display:block}
+.marker-label{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:100%;
+  margin-top:4px;
+  white-space:nowrap;
+  border-radius:10px;
+  background:rgba(15,23,42,.95);
+  border:1px solid #334155;
+  padding:4px 8px;
+  transform:translateX(-50%);
+  text-align:center;
+  line-height:1.25;
+  z-index:5;
+}
+.marker:hover .marker-label,.marker:focus .marker-label{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:100%;
+  margin-top:4px;
+  white-space:nowrap;
+  border-radius:10px;
+  background:rgba(15,23,42,.95);
+  border:1px solid #334155;
+  padding:4px 8px;
+  transform:translateX(-50%);
+  text-align:center;
+  line-height:1.25;
+  z-index:5;
+}
 .marker-name{display:block;font-weight:800;font-size:12px;color:#fff}
 .marker-owner{display:block;font-size:10px;color:#facc15;margin-top:1px}
 .marker-list{display:flex;flex-direction:column;gap:8px}
@@ -58,7 +107,26 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 .sidebar label{font-size:17px!important;font-weight:700!important}
 .sidebar input,.sidebar select,.sidebar textarea,.sidebar button{font-size:17px!important;padding:12px 14px!important}
 .sidebar .small{font-size:15px!important;line-height:1.7!important}
-.marker{font-size:14px!important}
+.marker{
+  position:absolute;
+  transform:translate(-50%,-100%) scale(var(--marker-scale,1));
+  transform-origin:center bottom;
+  background:rgba(255,255,255,.92);
+  border:2px solid rgba(0,0,0,.85);
+  border-radius:999px;
+  padding:3px;
+  cursor:grab;
+  font-size:22px!important;
+  line-height:1;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.95));
+  width:auto;
+  min-width:28px;
+  min-height:28px;
+  touch-action:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
 </style>
 </head>
@@ -224,7 +292,7 @@ function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=n
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
-function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.12,Math.min(.34,.15*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.26,Math.min(.60,.34*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
 function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
