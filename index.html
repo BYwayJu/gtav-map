@@ -129,7 +129,7 @@
   <div class="app">
     <aside class="sidebar">
       <div class="title">GTAV 私人地圖</div>
-      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記。外面的人只能讀取公開標記；要標記/修改/刪除，必須填名字與 GitHub Token。</div>
+      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記。外面的人只能重新讀取標記；要標記/修改/刪除，必須填名字與 GitHub Token。</div>
 
       <div class="card">
         <label>地圖樣式</label>
@@ -274,13 +274,12 @@
         <label>你的名字（必填，會顯示誰標記）</label>
         <input id="playerName" placeholder="例如 阿甫 / 小白" />
 
-        <label>GitHub Token（上傳同步時才需要）</label>
-        <input id="ghToken" type="password" placeholder="上傳同步時貼 github_pat_ Token" />
+        <label>GitHub Token（修改標記時才需要）</label>
+        <input id="ghToken" type="password" placeholder="同步已修改標記時貼 github_pat_ Token" />
         <div class="small status-warn">外面的人可以直接重新讀取標記；要新增、移動、修改、刪除標記，必須填名字與 GitHub Token。</div>
         <div class="row" style="margin-top:8px;">
           <button type="button" onclick="saveSettings()">儲存設定</button>
           <button type="button" class="muted-btn" onclick="loadFromGithub()">重新讀取標記</button>
-          <button type="button" onclick="uploadLocalToGithub()">上傳同步</button>
         </div>
         <div id="syncStatus" class="small status-warn" style="margin-top:8px;">公開讀取模式；標記/修改/刪除必須填 GitHub Token</div>
       </div>
@@ -395,17 +394,13 @@
     }
 
     function saveLocalData() {
-      localStorage.setItem(getLocalKey(), JSON.stringify(allMarkers));
+      // 標記資料以 GitHub markers.json 為準；本機只保存目前地圖和選擇圖示
       localStorage.setItem("gtav_active_map", activeMap);
       localStorage.setItem("gtav_selected_icon", selectedIcon);
     }
 
     function loadLocalData() {
-      try {
-        allMarkers = JSON.parse(localStorage.getItem(getLocalKey()) || "{}");
-      } catch (e) {
-        allMarkers = {};
-      }
+      allMarkers = {};
     }
 
     function saveSettings() {
@@ -418,11 +413,11 @@
       const token = $("ghToken")?.value.trim();
 
       if (player && token) {
-        setStatus("設定已儲存。本機標記可用；按「上傳同步」時會使用 Token。", "ok");
+        setStatus("設定已儲存。你可以按「重新讀取標記」登入並啟用修改權限。", "ok");
       } else if (player && !token) {
-        setStatus("設定已儲存。本機標記可用；上傳同步才需要 Token。", "warn");
+        setStatus("設定已儲存。目前是觀看模式；修改標記需要 Token。", "warn");
       } else {
-        setStatus("請先填你的名字才能標記；上傳同步才需要 Token。", "warn");
+        setStatus("請先填你的名字。觀看不需要 Token，修改才需要。", "warn");
       }
     }
 
@@ -926,12 +921,21 @@
     }
 
     function canEditMarkers(showAlert = true) {
+      const cfg = getGithubConfig();
       const player = $("playerName")?.value?.trim() || "";
 
       if (!player) {
         if (showAlert) {
-          alert("請先填你的名字，這樣大家才知道是誰標記。");
+          alert("要修改標記，請先填你的名字，這樣大家才知道是誰標記。");
           $("playerName").focus();
+        }
+        return false;
+      }
+
+      if (!cfg.token) {
+        if (showAlert) {
+          alert("目前是觀看模式。要新增、移動、修改、刪除標記，請先填 GitHub Token。");
+          $("ghToken").focus();
         }
         return false;
       }
@@ -941,11 +945,11 @@
 
     function getGithubConfig() {
       return {
-        owner: ($("ghOwner")?.value || "BYwayJu").trim(),
-        repo: ($("ghRepo")?.value || "gtav-map").trim(),
-        branch: ($("ghBranch")?.value || "main").trim(),
-        path: ($("ghPath")?.value || "markers.json").trim(),
-        token: $("ghToken").value.trim(),
+        owner: "BYwayJu",
+        repo: "gtav-map",
+        branch: "main",
+        path: "markers.json",
+        token: $("ghToken") ? $("ghToken").value.trim() : "",
       };
     }
 
@@ -961,14 +965,9 @@
       const cfg = getGithubConfig();
 
       try {
-        const hasLocal = Object.values(allMarkers || {}).some(arr => Array.isArray(arr) && arr.length > 0);
-        if (hasLocal && !confirm("重新讀取會用 GitHub 上已同步的標記覆蓋你目前本機標記。確定讀取？")) {
-          return;
-        }
+        setStatus("讀取目前公開標記中...", "warn");
 
-        setStatus("重新讀取已同步標記中...", "warn");
-
-        // 有 Token：用 GitHub API 讀；沒 Token：讀公開 markers.json
+        // 有 Token：用 GitHub API 讀取，可取得 SHA，之後可以寫入
         if (cfg.token) {
           const url = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
           const res = await fetch(url, {
@@ -981,52 +980,55 @@
 
           const data = await res.json();
           githubSha = data.sha;
-          const raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
-          const parsed = raw.trim() ? JSON.parse(raw) : {};
+
+          let raw = "{}";
+          try {
+            raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
+          } catch {}
+
+          let parsed = {};
+          try {
+            parsed = raw.trim() ? JSON.parse(raw) : {};
+          } catch {}
+
           allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
-        } else {
-          const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
-          if (!res.ok) throw new Error(await res.text());
-          const text = await res.text();
-          const parsed = text.trim() ? JSON.parse(text) : {};
-          allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
+          renderMarkers();
+
+          const userName = $("playerName")?.value?.trim() || "未命名";
+          setStatus("已登入中：" + userName + "；可以新增/移動/修改/刪除標記", "ok");
+          return;
         }
 
-        saveLocalData();
+        // 沒 Token：任何人都能讀取公開 markers.json，只能觀看
+        const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(await res.text());
+
+        const text = await res.text();
+        let parsed = {};
+        try {
+          parsed = text.trim() ? JSON.parse(text) : {};
+        } catch {}
+
+        allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
         renderMarkers();
-        setStatus("已重新讀取同步標記到本機。之後修改仍只在本機，按「上傳同步」才公開。", "ok");
+
+        setStatus("已讀取目前公開標記；未填 Token 只能觀看", "ok");
       } catch (err) {
         console.error(err);
-        setStatus("重新讀取失敗；已保留目前本機標記", "bad");
+        allMarkers = {};
+        renderMarkers();
+        setStatus("讀取公開標記失敗；目前先顯示空白標記", "warn");
       }
     }
 
     async function pushToGithub(message) {
-      // 本機模式：新增 / 移動 / 修改 / 刪除都只存自己瀏覽器，不自動同步
-      saveLocalData();
-      setStatus("已儲存在本機；其他人看不到。要公開給大家請按「上傳同步」。", "warn");
-    }
-
-    async function uploadLocalToGithub() {
       const cfg = getGithubConfig();
-      const player = $("playerName")?.value?.trim() || "";
-
-      if (!player) {
-        alert("請先填你的名字，這樣大家才知道是誰上傳/標記。");
-        $("playerName").focus();
-        return;
-      }
-
-      if (!cfg.token) {
-        alert("要上傳同步，請先填 GitHub Token。");
-        $("ghToken").focus();
-        return;
-      }
+      if (!canEditMarkers(true)) return;
 
       try {
-        setStatus("上傳同步到 GitHub 中...", "warn");
+        setStatus("同步到 GitHub 中...", "warn");
 
-        // 先讀取目前 GitHub 檔案 SHA，避免 PUT 失敗
+        // 先讀最新 SHA，避免多人同時修改衝突
         const getUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
         const getRes = await fetch(getUrl, {
           headers: {
@@ -1035,12 +1037,13 @@
           }
         });
         if (!getRes.ok) throw new Error(await getRes.text());
-        const data = await getRes.json();
-        githubSha = data.sha;
+
+        const current = await getRes.json();
+        githubSha = current.sha;
 
         const putUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json`;
         const body = {
-          message: "sync local markers",
+          message,
           content: b64encodeUtf8(JSON.stringify(allMarkers, null, 2)),
           branch: "main",
           sha: githubSha
@@ -1054,20 +1057,21 @@
           },
           body: JSON.stringify(body)
         });
+
         if (!putRes.ok) throw new Error(await putRes.text());
 
         const putData = await putRes.json();
         githubSha = putData.content.sha;
-        setStatus("已上傳同步。其他人重新整理或按「重新讀取標記」後就會看到。", "ok");
-        alert("已上傳同步，其他人重新整理或按「重新讀取標記」後就會看到。");
+        setStatus("已同步到 GitHub；所有人重新讀取後可看到", "ok");
       } catch (err) {
         console.error(err);
-        setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限", "bad");
-        alert("上傳失敗：請確認 Token 有 Contents Read and write 權限，且你有此 repo 權限。");
+        setStatus("同步失敗：請確認 Token 有 Contents Read and write 權限", "bad");
+        alert("同步失敗。請確認 Token 有 Contents Read and write 權限，且你有此 repo 權限。");
+        await loadFromGithub();
       }
     }
 
-        window.addEventListener("resize", resetView);
+    window.addEventListener("resize", resetView);
 
     loadLocalData();
     loadSettings();
@@ -1076,6 +1080,7 @@
     if (filterSelect) filterSelect.value = activeFilter;
     selectIcon(selectedIcon);
     switchMap(activeMap);
+    setTimeout(() => loadFromGithub(), 500);
     
   </script>
 </body>
