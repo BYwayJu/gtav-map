@@ -201,8 +201,9 @@
         <input id="ghBranch" value="main" />
         <label>資料檔路徑</label>
         <input id="ghPath" value="markers.json" />
-        <label>GitHub Token（可不填）</label>
+        <label>GitHub Token（必填）</label>
         <input id="ghToken" type="password" placeholder="必填：GitHub Token" />
+        <div class="small status-warn">此版本不使用本機標記；每個要新增/修改/刪除的人都必須填自己的 GitHub Token。</div>
         <div class="row" style="margin-top:8px;">
           <button type="button" onclick="saveSettings()">儲存設定</button>
           <button type="button" class="muted-btn" onclick="loadFromGithub()">讀取 GitHub</button>
@@ -577,7 +578,7 @@
         if (!editMode) return;
         const cfg = getGithubConfig();
         if (!cfg.owner || !cfg.repo || !cfg.token) {
-          alert("請先填 GitHub 帳號、Repo、Token，並按「讀取 GitHub」登入後才能標記。");
+          alert("請先填 GitHub 帳號、Repo、GitHub Token，並按「讀取 GitHub」後才能標記。");
           return;
         }
         const player = $("playerName").value.trim();
@@ -767,7 +768,7 @@
       } else {
         const cfg = getGithubConfig();
         if (!cfg.owner || !cfg.repo || !cfg.token) {
-          alert("請先填 GitHub 帳號、Repo、Token，並按「讀取 GitHub」登入後才能標記。");
+          alert("請先填 GitHub 帳號、Repo、GitHub Token，並按「讀取 GitHub」後才能標記。");
           closeModal();
           return;
         }
@@ -827,6 +828,7 @@
       const cfg = getGithubConfig();
       if (!cfg.owner || !cfg.repo || !cfg.token) {
         setStatus("必須填 GitHub 帳號 / Repo / Token 才能使用", "bad");
+        alert("請先填 GitHub 帳號、Repo、GitHub Token，然後再按「讀取 GitHub」。");
         return;
       }
 
@@ -845,10 +847,11 @@
         const parsed = JSON.parse(b64decodeUtf8(data.content.replace(/\n/g, "")) || "{}");
         allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : parsed;
         renderMarkers();
-        setStatus("已登入並讀取 GitHub；新增/修改會同步給所有人", "ok");
+        setStatus("已登入並讀取 GitHub；新增/修改/刪除會同步給所有人", "ok");
       } catch (err) {
         console.error(err);
         setStatus("GitHub 讀取失敗：請確認 Token 權限 Contents Read and Write", "bad");
+        alert("GitHub 讀取失敗。請確認 Token 有 Contents: Read and write 權限，並且 Repo 名稱正確。");
       }
     }
 
@@ -856,7 +859,7 @@
       const cfg = getGithubConfig();
       if (!cfg.owner || !cfg.repo || !cfg.token) {
         setStatus("未登入 GitHub Token，無法儲存標記", "bad");
-        alert("未登入 GitHub Token，無法儲存標記。");
+        alert("請先填 GitHub 帳號、Repo、GitHub Token，並按「讀取 GitHub」後才能儲存標記。");
         return;
       }
       try {
