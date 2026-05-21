@@ -41,14 +41,14 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   background:rgba(255,255,255,.92);
   border:2px solid rgba(0,0,0,.85);
   border-radius:999px;
-  padding:3px;
+  padding:4px;
   cursor:grab;
-  font-size:22px!important;
+  font-size:24px!important;
   line-height:1;
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.95));
   width:auto;
-  min-width:28px;
-  min-height:28px;
+  min-width:34px;
+  min-height:34px;
   touch-action:none;
   display:flex;
   align-items:center;
@@ -87,8 +87,8 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   line-height:1.25;
   z-index:5;
 }
-.marker-name{display:block;font-weight:800;font-size:12px;color:#fff}
-.marker-owner{display:block;font-size:10px;color:#facc15;margin-top:1px}
+.marker-name{display:block;font-weight:800;font-size:13px;color:#fff}
+.marker-owner{display:block;font-size:11px;color:#facc15;margin-top:1px}
 .marker-list{display:flex;flex-direction:column;gap:8px}
 .marker-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;text-align:left}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
@@ -114,14 +114,14 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   background:rgba(255,255,255,.92);
   border:2px solid rgba(0,0,0,.85);
   border-radius:999px;
-  padding:3px;
+  padding:4px;
   cursor:grab;
-  font-size:22px!important;
+  font-size:24px!important;
   line-height:1;
   filter:drop-shadow(0 2px 5px rgba(0,0,0,.95));
   width:auto;
-  min-width:28px;
-  min-height:28px;
+  min-width:34px;
+  min-height:34px;
   touch-action:none;
   display:flex;
   align-items:center;
@@ -135,6 +135,15 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   box-shadow:0 0 0 3px rgba(34,211,238,.25);
 }
 .icon-btn:active{transform:scale(.97)}
+
+
+/* keep dropdown and direct icon click */
+.icon-btn.active,.iconBtn.active{
+  outline:3px solid #22d3ee!important;
+  background:#0e7490!important;
+  box-shadow:0 0 0 3px rgba(34,211,238,.25)!important;
+}
+.icon-btn:active,.iconBtn:active{transform:scale(.97)}
 
 </style>
 </head>
@@ -161,8 +170,8 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   <div class="card">
     <label>你的名字（會顯示誰標記）</label>
     <input id="playerName" placeholder="例如 BYWAY" />
-    <label>直接點下面圖案即可選擇</label>
-    <select id="iconSelect" onchange="selectIcon(this.value)" style="display:none">
+    <label>標記圖案</label>
+    <select id="iconSelect" onchange="selectIcon(this.value)">
       <option value="🏠">🏠 房子</option>
 <option value="💎">💎 鑽石</option>
 <option value="🐟">🐟 魚</option>
@@ -188,31 +197,31 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 <option value="🏨">🏨 飯店</option>
 <option value="📍">📍 一般標記</option>
     </select>
-    <div class="small warn">不用選上面的下拉選單，直接點下面的圖案即可。</div>
-    <div class="icon-grid"><button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe0")" title="房子">🏠<span>房子</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc8e")" title="鑽石">💎<span>鑽石</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc1f")" title="魚">🐟<span>魚</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udcc4")" title="紙張">📄<span>紙張</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udcf1")" title="平板">📱<span>平板</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfed")" title="托車廠">🏭<span>托車廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\ude93")" title="伐木中心">🪓<span>伐木中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfa3")" title="漁業中心">🎣<span>漁業中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26cf\ufe0f")" title="礦業中心">⛏️<span>礦業中心</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udca0")" title="礦石清洗區">💠<span>礦石清洗區</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude9c")" title="農場管理員">🚜<span>農場管理員</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\ude9d")" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udeb5")" title="鋸木廠">🪵<span>鋸木廠</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83e\udded")" title="導航點">🧭<span>導航點</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\ude97")" title="二手車商">🚗<span>二手車商</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udd7f\ufe0f")" title="停車場">🅿️<span>停車場</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\uded2")" title="商店">🛒<span>商店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe5")" title="醫院">🏥<span>醫院</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udee1\ufe0f")" title="警局">🛡️<span>警局</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd27")" title="機械師">🔧<span>機械師</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udd2b")" title="武器商人">🔫<span>武器商人</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\u26a1")" title="電力維修工">⚡<span>電力維修工</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe8")" title="飯店">🏨<span>飯店</span></button>
-<button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udccd")" title="一般標記">📍<span>一般標記</span></button></div>
+    <div class="small warn">可用上方選單選圖案，也可以直接點下面圖案；兩種都會切換目前標記圖示。</div>
+    <div class="icon-grid"><button type="button" class="icon-btn" data-icon="\ud83c\udfe0" onclick="selectIcon("\ud83c\udfe0")" title="房子">🏠<span>房子</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udc8e" onclick="selectIcon("\ud83d\udc8e")" title="鑽石">💎<span>鑽石</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udc1f" onclick="selectIcon("\ud83d\udc1f")" title="魚">🐟<span>魚</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udcc4" onclick="selectIcon("\ud83d\udcc4")" title="紙張">📄<span>紙張</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udcf1" onclick="selectIcon("\ud83d\udcf1")" title="平板">📱<span>平板</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83c\udfed" onclick="selectIcon("\ud83c\udfed")" title="托車廠">🏭<span>托車廠</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83e\ude93" onclick="selectIcon("\ud83e\ude93")" title="伐木中心">🪓<span>伐木中心</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83c\udfa3" onclick="selectIcon("\ud83c\udfa3")" title="漁業中心">🎣<span>漁業中心</span></button>
+<button type="button" class="icon-btn" data-icon="\u26cf\ufe0f" onclick="selectIcon("\u26cf\ufe0f")" title="礦業中心">⛏️<span>礦業中心</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udca0" onclick="selectIcon("\ud83d\udca0")" title="礦石清洗區">💠<span>礦石清洗區</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\ude9c" onclick="selectIcon("\ud83d\ude9c")" title="農場管理員">🚜<span>農場管理員</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83e\ude9d" onclick="selectIcon("\ud83e\ude9d")" title="釣魚佈告欄">🪝<span>釣魚佈告欄</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83e\udeb5" onclick="selectIcon("\ud83e\udeb5")" title="鋸木廠">🪵<span>鋸木廠</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83e\udded" onclick="selectIcon("\ud83e\udded")" title="導航點">🧭<span>導航點</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\ude97" onclick="selectIcon("\ud83d\ude97")" title="二手車商">🚗<span>二手車商</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83c\udd7f\ufe0f" onclick="selectIcon("\ud83c\udd7f\ufe0f")" title="停車場">🅿️<span>停車場</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\uded2" onclick="selectIcon("\ud83d\uded2")" title="商店">🛒<span>商店</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83c\udfe5" onclick="selectIcon("\ud83c\udfe5")" title="醫院">🏥<span>醫院</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udee1\ufe0f" onclick="selectIcon("\ud83d\udee1\ufe0f")" title="警局">🛡️<span>警局</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udd27" onclick="selectIcon("\ud83d\udd27")" title="機械師">🔧<span>機械師</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udd2b" onclick="selectIcon("\ud83d\udd2b")" title="武器商人">🔫<span>武器商人</span></button>
+<button type="button" class="icon-btn" data-icon="\u26a1" onclick="selectIcon("\u26a1")" title="電力維修工">⚡<span>電力維修工</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83c\udfe8" onclick="selectIcon("\ud83c\udfe8")" title="飯店">🏨<span>飯店</span></button>
+<button type="button" class="icon-btn" data-icon="\ud83d\udccd" onclick="selectIcon("\ud83d\udccd")" title="一般標記">📍<span>一般標記</span></button></div>
     <label>自訂圖示（可留空）</label>
     <input id="customIcon" placeholder="例如 💰" />
     <div class="small">點地圖新增標記；按住標記可拖曳移動；點標記可編輯。</div>
@@ -298,22 +307,23 @@ function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").v
 function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null&&$("playerName"))$("playerName").value=n;if(t!==null&&$("ghToken"))$("ghToken").value=t}
 function selectIcon(icon){
   selectedIcon = icon;
+
   const sel = $("iconSelect");
   if (sel) sel.value = icon;
 
-  document.querySelectorAll(".icon-btn").forEach(btn => {
+  document.querySelectorAll(".icon-btn,.iconBtn").forEach(btn => {
     const btnIcon = btn.getAttribute("data-icon") || "";
     btn.classList.toggle("active", btnIcon === icon || btn.textContent.includes(icon));
   });
 
   localStorage.setItem("gtav_selected_icon", icon);
-  setStatus("已選擇圖案：" + icon + "，現在點地圖即可新增標記。", "ok");
+  setStatus("目前選擇圖案：" + icon + "，點地圖即可新增這個圖標。", "ok");
 }
 function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
-function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.26,Math.min(.60,.34*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.22,Math.min(.52,.28*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
 function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
