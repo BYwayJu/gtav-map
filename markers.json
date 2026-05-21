@@ -11,48 +11,5 @@
       "createdAt": 1779360824454
     }
   ],
-  "map-atlas.png": [
-    {
-      "id": "5b55f3cd-e2c9-4418-af6a-246255d2f51d",
-      "xPct": 56.0307458867226,
-      "yPct": 83.01182077704395,
-      "icon": "📄",
-      "name": "黑市",
-      "note": "黑市~~~~~~",
-      "owner": "BYwayJu",
-      "createdAt": 1779370905730,
-      "updatedAt": 1779370910572
-    },
-    {
-      "id": "2e1e2b98-90d3-411f-946f-d240572d7c1a",
-      "xPct": 34.811774479657394,
-      "yPct": 71.55491553595817,
-      "icon": "🏛️",
-      "name": "~",
-      "note": "~",
-      "owner": "BYwayJu",
-      "createdAt": 1779371324441
-    },
-    {
-      "id": "820a6344-10df-4b77-bbfb-f11144b5ca65",
-      "xPct": 49.460491313112975,
-      "yPct": 72.78618001915697,
-      "icon": "🏛️",
-      "name": "~",
-      "note": "~~~~~~~~",
-      "owner": "BYwayJu",
-      "createdAt": 1779371326363,
-      "updatedAt": 1779372683640
-    },
-    {
-      "id": "bfbebc2d-35cd-4b0e-9555-0d2f0d378d6c",
-      "xPct": 49.52241709319261,
-      "yPct": 73.63207369990354,
-      "icon": "🏛️",
-      "name": "~",
-      "note": "~",
-      "owner": "BYwayJu",
-      "createdAt": 1779372418314
-    }
-  ]
+  "map-atlas.png": []
 }
