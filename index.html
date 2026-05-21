@@ -43,9 +43,38 @@ filter:none;
 pointer-events:auto;
 }
 .marker svg{width:30px;height:30px;display:block}
-.marker-label{display:none;position:absolute;left:50%;top:100%;margin-top:5px;white-space:nowrap;border-radius:6px;background:rgba(0,0,0,.86);border:1px solid rgba(255,255,255,.16);padding:4px 7px;transform:translateX(-50%);text-align:center;line-height:1.3;z-index:999;box-shadow:0 2px 6px rgba(0,0,0,.55)}
+.marker-label{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  min-width:145px;
+  max-width:240px;
+  white-space:normal;
+  border-radius:9px;
+  background:rgba(0,0,0,.92);
+  border:1px solid rgba(255,255,255,.25);
+  padding:7px 10px;
+  text-align:center;
+  line-height:1.35;
+  z-index:999;
+  box-shadow:0 3px 10px rgba(0,0,0,.75);
+  pointer-events:none;
+}
 .marker:hover .marker-label,.marker:focus .marker-label{display:block}
-.marker-name{display:block;font-weight:800;font-size:13px;color:#fff} .marker-owner{display:block;font-size:11px;color:#facc15;margin-top:1px;font-weight:700}
+.marker-name{
+  display:block;
+  font-weight:900;
+  font-size:13px;
+  color:#fff;
+} .marker-owner{
+  display:block;
+  font-size:11px;
+  color:#facc15;
+  margin-top:2px;
+  font-weight:700;
+}
 
 .icon-btn 
 .marker-list{display:flex;flex-direction:column;gap:8px}
@@ -89,6 +118,16 @@ pointer-events:auto;
   margin-bottom:4px;
 }
 
+
+.marker-note{
+  display:block;
+  font-size:11px;
+  color:#cbd5e1;
+  margin-top:4px;
+  border-top:1px solid rgba(255,255,255,.18);
+  padding-top:4px;
+  word-break:break-word;
+}
 </style>
 </head>
 <body>
@@ -234,7 +273,7 @@ viewer.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchInfo){e.pr
 viewer.addEventListener("touchend",()=>{pinchInfo=null;dragInfo.blocked=false});
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
 function positionMarkers(){document.querySelectorAll(".marker").forEach(btn=>{const x=Number(btn.dataset.xpct)*imgSize.w*viewState.scale/100+viewState.x;const y=Number(btn.dataset.ypct)*imgSize.h*viewState.scale/100+viewState.y;btn.style.left=x+"px";btn.style.top=y+"px"})}
-function renderMarkers(){markerLayer.innerHTML="";const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.dataset.id=marker.id;btn.dataset.xpct=marker.xPct;btn.dataset.ypct=marker.yPct;btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span></span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});markerLayer.appendChild(btn)});positionMarkers();$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${iconMarkup(m.icon)} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
+function renderMarkers(){markerLayer.innerHTML="";const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.dataset.id=marker.id;btn.dataset.xpct=marker.xPct;btn.dataset.ypct=marker.yPct;btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span>${marker.note ? `<span class="marker-note">${escapeHtml(marker.note)}</span>` : ""}</span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});markerLayer.appendChild(btn)});positionMarkers();$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${iconMarkup(m.icon)} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
 window.addEventListener("pointermove",e=>{if(!movingMarkerId)return;e.preventDefault();movingMarkerMoved=true;const point=screenToImage(e.clientX,e.clientY),markers=getMarkerBucket(),m=markers.find(x=>x.id===movingMarkerId);if(!m)return;m.xPct=point.xPct;m.yPct=point.yPct;setMarkerBucket(markers);renderMarkers()},{passive:false});
 window.addEventListener("pointerup",()=>{if(!movingMarkerId)return;if(movingMarkerMoved){suppressNextMarkerClick=true;setStatus("已移動標記並存在本機；要公開請按「上傳同步」。","warn")}movingMarkerId=null;movingMarkerMoved=false;setTimeout(()=>suppressNextMarkerClick=false,80)});
 function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();$("deleteBtn").style.display="none";modal.style.display="flex"}
