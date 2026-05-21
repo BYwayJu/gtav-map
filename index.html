@@ -128,6 +128,14 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   justify-content:center;
 }
 
+
+.icon-btn.active{
+  outline:3px solid #22d3ee!important;
+  background:#0e7490!important;
+  box-shadow:0 0 0 3px rgba(34,211,238,.25);
+}
+.icon-btn:active{transform:scale(.97)}
+
 </style>
 </head>
 <body>
@@ -153,8 +161,8 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   <div class="card">
     <label>你的名字（會顯示誰標記）</label>
     <input id="playerName" placeholder="例如 BYWAY" />
-    <label>標記圖案</label>
-    <select id="iconSelect" onchange="selectIcon(this.value)">
+    <label>直接點下面圖案即可選擇</label>
+    <select id="iconSelect" onchange="selectIcon(this.value)" style="display:none">
       <option value="🏠">🏠 房子</option>
 <option value="💎">💎 鑽石</option>
 <option value="🐟">🐟 魚</option>
@@ -180,6 +188,7 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 <option value="🏨">🏨 飯店</option>
 <option value="📍">📍 一般標記</option>
     </select>
+    <div class="small warn">不用選上面的下拉選單，直接點下面的圖案即可。</div>
     <div class="icon-grid"><button type="button" class="icon-btn" onclick="selectIcon("\ud83c\udfe0")" title="房子">🏠<span>房子</span></button>
 <button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc8e")" title="鑽石">💎<span>鑽石</span></button>
 <button type="button" class="icon-btn" onclick="selectIcon("\ud83d\udc1f")" title="魚">🐟<span>魚</span></button>
@@ -287,7 +296,19 @@ function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMa
 function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
 function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
 function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null&&$("playerName"))$("playerName").value=n;if(t!==null&&$("ghToken"))$("ghToken").value=t}
-function selectIcon(icon){selectedIcon=icon;$("iconSelect").value=icon;document.querySelectorAll(".icon-btn").forEach(b=>b.classList.toggle("active",b.textContent.includes(icon)));localStorage.setItem("gtav_selected_icon",icon)}
+function selectIcon(icon){
+  selectedIcon = icon;
+  const sel = $("iconSelect");
+  if (sel) sel.value = icon;
+
+  document.querySelectorAll(".icon-btn").forEach(btn => {
+    const btnIcon = btn.getAttribute("data-icon") || "";
+    btn.classList.toggle("active", btnIcon === icon || btn.textContent.includes(icon));
+  });
+
+  localStorage.setItem("gtav_selected_icon", icon);
+  setStatus("已選擇圖案：" + icon + "，現在點地圖即可新增標記。", "ok");
+}
 function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
