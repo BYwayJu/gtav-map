@@ -890,11 +890,11 @@
 
     function getGithubConfig() {
       return {
-        owner: ($("ghOwner")?.value || "BYwayJu").trim(),
-        repo: ($("ghRepo")?.value || "gtav-map").trim(),
-        branch: ($("ghBranch")?.value || "main").trim(),
-        path: ($("ghPath")?.value || "markers.json").trim(),
-        token: $("ghToken").value.trim(),
+        owner: "BYwayJu",
+        repo: "gtav-map",
+        branch: "main",
+        path: "markers.json",
+        token: $("ghToken") ? $("ghToken").value.trim() : "",
       };
     }
 
@@ -910,11 +910,11 @@
       const cfg = getGithubConfig();
 
       try {
-        setStatus("重新讀取標記中...", "warn");
+        setStatus("讀取公開標記中...", "warn");
 
-        // 有 Token：用 GitHub API 讀取，可取得 SHA，之後可寫入
-        if (cfg.owner && cfg.repo && cfg.token) {
-          const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`;
+        // 有 Token：用 GitHub API 讀取，之後可以寫入
+        if (cfg.token) {
+          const url = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
           const res = await fetch(url, {
             headers: {
               Authorization: `Bearer ${cfg.token}`,
@@ -922,25 +922,35 @@
             }
           });
           if (!res.ok) throw new Error(await res.text());
+
           const data = await res.json();
           githubSha = data.sha;
-          const parsed = JSON.parse(b64decodeUtf8(data.content.replace(/\n/g, "")) || "{}");
-          allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : parsed;
+
+          const raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
+          const parsed = raw.trim() ? JSON.parse(raw) : {};
+          allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
           renderMarkers();
-          setStatus("已登入中：" + ($("playerName").value.trim() || "未命名") + "；標記權限已啟用", "ok");
+
+          const userName = $("playerName")?.value?.trim() || "未命名";
+          setStatus("已登入中：" + userName + "；已讀取 GitHub 標記，可新增/修改/刪除", "ok");
           return;
         }
 
-        // 沒 Token：只讀公開 markers.json，不能編輯
+        // 沒 Token：直接讀公開 markers.json。
+        // 你現在打開 /markers.json 看到 {}，這就是有效資料，代表目前公開標記為 0。
         const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
         if (!res.ok) throw new Error(await res.text());
-        const parsed = await res.json();
-        allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : parsed;
+
+        const text = await res.text();
+        const parsed = text.trim() ? JSON.parse(text) : {};
+        allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
         renderMarkers();
-        setStatus("已重新讀取標記；未填 Token 只能觀看", "ok");
+
+        setStatus("已讀取公開標記；目前公開標記數量可能是 0。要新增/修改/刪除請填 Token。", "ok");
       } catch (err) {
         console.error(err);
-        setStatus("讀取失敗：請確認 markers.json 已上傳", "bad");
+        setStatus("讀取失敗：markers.json 格式錯誤，或網站快取尚未更新", "bad");
+        alert("讀取失敗。你可以先確認 markers.json 內容是 {} 或合法 JSON，然後用 ?v=999 重新整理網站。");
       }
     }
 
