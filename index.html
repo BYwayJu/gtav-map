@@ -199,12 +199,13 @@
         <label>你的名字（必填，會顯示誰標記）</label>
         <input id="playerName" placeholder="例如 阿甫 / 小白" />
 
-        <label>GitHub Token（標記必填）</label>
-        <input id="ghToken" type="password" placeholder="要標記時貼 github_pat_ Token" />
+        <label>GitHub Token（上傳同步時才需要）</label>
+        <input id="ghToken" type="password" placeholder="上傳同步時貼 github_pat_ Token" />
         <div class="small status-warn">外面的人可以直接重新讀取標記；要新增、移動、修改、刪除標記，必須填名字與 GitHub Token。</div>
         <div class="row" style="margin-top:8px;">
           <button type="button" onclick="saveSettings()">儲存設定</button>
           <button type="button" class="muted-btn" onclick="loadFromGithub()">重新讀取標記</button>
+          <button type="button" onclick="uploadLocalToGithub()">上傳同步</button>
         </div>
         <div id="syncStatus" class="small status-warn" style="margin-top:8px;">公開讀取模式；標記/修改/刪除必須填 GitHub Token</div>
       </div>
@@ -314,21 +315,40 @@
       return "gtav_markers_local";
     }
 
+    function getLocalKey() {
+      return "gtav_markers_local";
+    }
+
     function saveLocalData() {
-      // 此版本不把標記存在本機；標記以 GitHub markers.json 為準
+      localStorage.setItem(getLocalKey(), JSON.stringify(allMarkers));
       localStorage.setItem("gtav_active_map", activeMap);
       localStorage.setItem("gtav_selected_icon", selectedIcon);
     }
 
     function loadLocalData() {
-      allMarkers = {};
+      try {
+        allMarkers = JSON.parse(localStorage.getItem(getLocalKey()) || "{}");
+      } catch (e) {
+        allMarkers = {};
+      }
     }
 
     function saveSettings() {
       ["playerName","ghToken"].forEach(id => {
-        localStorage.setItem("gtav_" + id, $(id).value);
+        const el = $(id);
+        if (el) localStorage.setItem("gtav_" + id, el.value);
       });
-      setStatus("設定已儲存", "ok");
+
+      const player = $("playerName")?.value.trim();
+      const token = $("ghToken")?.value.trim();
+
+      if (player && token) {
+        setStatus("設定已儲存。本機標記可用；按「上傳同步」時會使用 Token。", "ok");
+      } else if (player && !token) {
+        setStatus("設定已儲存。本機標記可用；上傳同步才需要 Token。", "warn");
+      } else {
+        setStatus("請先填你的名字才能標記；上傳同步才需要 Token。", "warn");
+      }
     }
 
     function loadSettings() {
@@ -831,28 +851,12 @@
     }
 
     function canEditMarkers(showAlert = true) {
-      const cfg = getGithubConfig();
       const player = $("playerName")?.value?.trim() || "";
 
       if (!player) {
         if (showAlert) {
           alert("請先填你的名字，這樣大家才知道是誰標記。");
           $("playerName").focus();
-        }
-        return false;
-      }
-
-      if (!cfg.token) {
-        if (showAlert) {
-          alert("要新增、移動、修改、刪除標記，請先填 GitHub Token，然後按「重新讀取標記」登入。");
-          $("ghToken").focus();
-        }
-        return false;
-      }
-
-      if (!githubWriteReady) {
-        if (showAlert) {
-          alert("請先按「重新讀取標記」。成功顯示登入中後，才可以新增、移動、修改、刪除。");
         }
         return false;
       }
@@ -880,12 +884,16 @@
 
     async function loadFromGithub() {
       const cfg = getGithubConfig();
-      githubWriteReady = false;
 
       try {
-        setStatus("讀取標記中...", "warn");
+        const hasLocal = Object.values(allMarkers || {}).some(arr => Array.isArray(arr) && arr.length > 0);
+        if (hasLocal && !confirm("重新讀取會用 GitHub 上已同步的標記覆蓋你目前本機標記。確定讀取？")) {
+          return;
+        }
 
-        // 有 Token：用 GitHub API 讀取；成功後才允許新增/移動/修改/刪除。
+        setStatus("重新讀取已同步標記中...", "warn");
+
+        // 有 Token：用 GitHub API 讀；沒 Token：讀公開 markers.json
         if (cfg.token) {
           const url = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
           const res = await fetch(url, {
@@ -898,60 +906,52 @@
 
           const data = await res.json();
           githubSha = data.sha;
-
-          let raw = "";
-          try {
-            raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
-          } catch {
-            raw = "{}";
-          }
-
-          let parsed = {};
-          try {
-            parsed = raw.trim() ? JSON.parse(raw) : {};
-          } catch {
-            parsed = {};
-          }
-
+          const raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
+          const parsed = raw.trim() ? JSON.parse(raw) : {};
           allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
-          renderMarkers();
-
-          githubWriteReady = true;
-          const userName = $("playerName")?.value?.trim() || "未命名";
-          setStatus("已登入中：" + userName + "；現在可以新增/移動/修改/刪除標記", "ok");
-          return;
+        } else {
+          const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
+          if (!res.ok) throw new Error(await res.text());
+          const text = await res.text();
+          const parsed = text.trim() ? JSON.parse(text) : {};
+          allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
         }
 
-        // 沒 Token：只讀公開 markers.json，只能看不能改。
-        const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) throw new Error(await res.text());
-
-        let text = await res.text();
-        let parsed = {};
-        try {
-          parsed = text.trim() ? JSON.parse(text) : {};
-        } catch {
-          parsed = {};
-        }
-
-        allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
+        saveLocalData();
         renderMarkers();
-        setStatus("已讀取公開標記；未填 Token 只能觀看", "ok");
+        setStatus("已重新讀取同步標記到本機。之後修改仍只在本機，按「上傳同步」才公開。", "ok");
       } catch (err) {
         console.error(err);
-        githubWriteReady = false;
-        setStatus("讀取失敗：Token 權限不足或 repo 權限不正確", "bad");
+        setStatus("重新讀取失敗；已保留目前本機標記", "bad");
       }
     }
 
     async function pushToGithub(message) {
+      // 本機模式：新增 / 移動 / 修改 / 刪除都只存自己瀏覽器，不自動同步
+      saveLocalData();
+      setStatus("已儲存在本機；其他人看不到。要公開給大家請按「上傳同步」。", "warn");
+    }
+
+    async function uploadLocalToGithub() {
       const cfg = getGithubConfig();
-      if (!canEditMarkers(true)) return;
+      const player = $("playerName")?.value?.trim() || "";
+
+      if (!player) {
+        alert("請先填你的名字，這樣大家才知道是誰上傳/標記。");
+        $("playerName").focus();
+        return;
+      }
+
+      if (!cfg.token) {
+        alert("要上傳同步，請先填 GitHub Token。");
+        $("ghToken").focus();
+        return;
+      }
 
       try {
-        setStatus("同步到 GitHub 中...", "warn");
+        setStatus("上傳同步到 GitHub 中...", "warn");
 
-        // 先讀最新 SHA，避免多人同時修改造成衝突
+        // 先讀取目前 GitHub 檔案 SHA，避免 PUT 失敗
         const getUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
         const getRes = await fetch(getUrl, {
           headers: {
@@ -960,13 +960,12 @@
           }
         });
         if (!getRes.ok) throw new Error(await getRes.text());
-
-        const current = await getRes.json();
-        githubSha = current.sha;
+        const data = await getRes.json();
+        githubSha = data.sha;
 
         const putUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json`;
         const body = {
-          message,
+          message: "sync local markers",
           content: b64encodeUtf8(JSON.stringify(allMarkers, null, 2)),
           branch: "main",
           sha: githubSha
@@ -980,22 +979,20 @@
           },
           body: JSON.stringify(body)
         });
-
         if (!putRes.ok) throw new Error(await putRes.text());
 
         const putData = await putRes.json();
         githubSha = putData.content.sha;
-        setStatus("已同步到 GitHub；其他人重新讀取後可看到", "ok");
+        setStatus("已上傳同步。其他人重新整理或按「重新讀取標記」後就會看到。", "ok");
+        alert("已上傳同步，其他人重新整理或按「重新讀取標記」後就會看到。");
       } catch (err) {
         console.error(err);
-        githubWriteReady = false;
-        setStatus("同步失敗：Token 沒有 Contents Read and write 或沒有 repo 權限", "bad");
-        // 不跳出視窗；重新讀取公開資料，避免畫面上留下未同步成功的標記
-        await loadFromGithub();
+        setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限", "bad");
+        alert("上傳失敗：請確認 Token 有 Contents Read and write 權限，且你有此 repo 權限。");
       }
     }
 
-    window.addEventListener("resize", resetView);
+        window.addEventListener("resize", resetView);
 
     loadLocalData();
     loadSettings();
@@ -1004,7 +1001,7 @@
     if (filterSelect) filterSelect.value = activeFilter;
     selectIcon(selectedIcon);
     switchMap(activeMap);
-    setTimeout(() => loadFromGithub(), 500);
+    
   </script>
 </body>
 </html>
