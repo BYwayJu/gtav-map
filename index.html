@@ -71,8 +71,6 @@
       </div>
 
       <div class="card">
-        <label>你的名字</label>
-        <input id="playerName" placeholder="例如 BYwayJu" />
         <label>標記圖案</label>
         <select id="iconSelect" onchange="selectIcon(this.value)">
           <option value="🏠">🏠 房子</option>
@@ -193,17 +191,17 @@
       </div>
 
       <div class="card">
-        <label>GitHub 帳號</label>
-        <input id="ghOwner" placeholder="例如 BYwayJu" />
-        <label>Repo 名稱</label>
-        <input id="ghRepo" placeholder="例如 gtav-map" />
-        <label>Branch</label>
-        <input id="ghBranch" value="main" />
-        <label>資料檔路徑</label>
-        <input id="ghPath" value="markers.json" />
+        <input id="ghOwner" type="hidden" value="BYwayJu" />
+        <input id="ghRepo" type="hidden" value="gtav-map" />
+        <input id="ghBranch" type="hidden" value="main" />
+        <input id="ghPath" type="hidden" value="markers.json" />
+
+        <label>你的名字（必填，會顯示誰標記）</label>
+        <input id="playerName" placeholder="例如 阿甫 / 小白" />
+
         <label>GitHub Token（必填）</label>
-        <input id="ghToken" type="password" placeholder="必填：GitHub Token" />
-        <div class="small status-warn">此版本不使用本機標記；每個要新增/修改/刪除的人都必須填自己的 GitHub Token。</div>
+        <input id="ghToken" type="password" placeholder="貼上 github_pat_ 開頭的 Token" />
+        <div class="small status-warn">此版本固定同步到 BYwayJu / gtav-map / markers.json。每個要新增/修改/刪除的人只要填自己的名字與 GitHub Token。</div>
         <div class="row" style="margin-top:8px;">
           <button type="button" onclick="saveSettings()">儲存設定</button>
           <button type="button" class="muted-btn" onclick="loadFromGithub()">讀取 GitHub</button>
@@ -305,14 +303,14 @@
     }
 
     function saveSettings() {
-      ["playerName","ghOwner","ghRepo","ghBranch","ghPath","ghToken"].forEach(id => {
+      ["playerName","ghToken"].forEach(id => {
         localStorage.setItem("gtav_" + id, $(id).value);
       });
       setStatus("設定已儲存", "ok");
     }
 
     function loadSettings() {
-      ["playerName","ghOwner","ghRepo","ghBranch","ghPath","ghToken"].forEach(id => {
+      ["playerName","ghToken"].forEach(id => {
         const v = localStorage.getItem("gtav_" + id);
         if (v !== null) $(id).value = v;
       });
@@ -578,7 +576,7 @@
         if (!editMode) return;
         const cfg = getGithubConfig();
         if (!cfg.owner || !cfg.repo || !cfg.token) {
-          alert("請先填 GitHub 帳號、Repo、GitHub Token，並按「讀取 GitHub」後才能標記。");
+          alert("請先填你的名字與 GitHub Token，並按「讀取 GitHub」後才能標記。");
           return;
         }
         const player = $("playerName").value.trim();
@@ -768,7 +766,7 @@
       } else {
         const cfg = getGithubConfig();
         if (!cfg.owner || !cfg.repo || !cfg.token) {
-          alert("請先填 GitHub 帳號、Repo、GitHub Token，並按「讀取 GitHub」後才能標記。");
+          alert("請先填你的名字與 GitHub Token，並按「讀取 GitHub」後才能標記。");
           closeModal();
           return;
         }
@@ -808,10 +806,10 @@
 
     function getGithubConfig() {
       return {
-        owner: $("ghOwner").value.trim(),
-        repo: $("ghRepo").value.trim(),
-        branch: $("ghBranch").value.trim() || "main",
-        path: $("ghPath").value.trim() || "markers.json",
+        owner: ($("ghOwner")?.value || "BYwayJu").trim(),
+        repo: ($("ghRepo")?.value || "gtav-map").trim(),
+        branch: ($("ghBranch")?.value || "main").trim(),
+        path: ($("ghPath")?.value || "markers.json").trim(),
         token: $("ghToken").value.trim(),
       };
     }
@@ -826,9 +824,15 @@
 
     async function loadFromGithub() {
       const cfg = getGithubConfig();
+      if (!$("playerName").value.trim()) {
+        setStatus("必須先填你的名字", "bad");
+        alert("請先填你的名字，這樣大家才知道是誰標記。");
+        $("playerName").focus();
+        return;
+      }
       if (!cfg.owner || !cfg.repo || !cfg.token) {
         setStatus("必須填 GitHub 帳號 / Repo / Token 才能使用", "bad");
-        alert("請先填 GitHub 帳號、Repo、GitHub Token，然後再按「讀取 GitHub」。");
+        alert("請先填你的名字與 GitHub Token，然後再按「讀取 GitHub」。");
         return;
       }
 
@@ -857,6 +861,12 @@
 
     async function pushToGithub(message) {
       const cfg = getGithubConfig();
+      if (!$("playerName").value.trim()) {
+        setStatus("必須先填你的名字", "bad");
+        alert("請先填你的名字，這樣大家才知道是誰標記。");
+        $("playerName").focus();
+        return;
+      }
       if (!cfg.owner || !cfg.repo || !cfg.token) {
         setStatus("未登入 GitHub Token，無法儲存標記", "bad");
         alert("請先填 GitHub 帳號、Repo、GitHub Token，並按「讀取 GitHub」後才能儲存標記。");
