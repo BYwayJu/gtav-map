@@ -34,61 +34,12 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 .hint{position:absolute;left:12px;bottom:12px;z-index:10;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #stage img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
-.marker{
-  position:absolute;
-  transform:translate(-50%,-100%) scale(var(--marker-scale,1));
-  transform-origin:center bottom;
-  background:rgba(255,255,255,.92);
-  border:2px solid rgba(0,0,0,.85);
-  border-radius:999px;
-  padding:4px;
-  cursor:grab;
-  font-size:24px!important;
-  line-height:1;
-  filter:drop-shadow(0 2px 5px rgba(0,0,0,.95));
-  width:auto;
-  min-width:34px;
-  min-height:34px;
-  touch-action:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+.marker{position:absolute;transform:translate(-50%,-100%) scale(var(--marker-scale,1));transform-origin:center bottom;background:transparent;border:none;padding:0;cursor:grab;font-size:18px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));width:auto;touch-action:none}
 .marker:active{cursor:grabbing}
-.marker-label{
-  display:none;
-  position:absolute;
-  left:50%;
-  top:100%;
-  margin-top:4px;
-  white-space:nowrap;
-  border-radius:10px;
-  background:rgba(15,23,42,.95);
-  border:1px solid #334155;
-  padding:4px 8px;
-  transform:translateX(-50%);
-  text-align:center;
-  line-height:1.25;
-  z-index:5;
-}
-.marker:hover .marker-label,.marker:focus .marker-label{
-  display:none;
-  position:absolute;
-  left:50%;
-  top:100%;
-  margin-top:4px;
-  white-space:nowrap;
-  border-radius:10px;
-  background:rgba(15,23,42,.95);
-  border:1px solid #334155;
-  padding:4px 8px;
-  transform:translateX(-50%);
-  text-align:center;
-  line-height:1.25;
-  z-index:5;
-}
-.marker-name{display:block;font-weight:800;font-size:13px;color:#fff}
-.marker-owner{display:block;font-size:11px;color:#facc15;margin-top:1px}
+.marker-label{display:none;margin-top:2px;white-space:nowrap;border-radius:10px;background:rgba(15,23,42,.92);border:1px solid #334155;padding:4px 8px;transform:translateX(-32%);text-align:center;line-height:1.25}
+.marker:hover .marker-label,.marker:focus .marker-label{display:block}
+.marker-name{display:block;font-weight:800;font-size:12px;color:#fff}
+.marker-owner{display:block;font-size:10px;color:#facc15;margin-top:1px}
 .marker-list{display:flex;flex-direction:column;gap:8px}
 .marker-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;text-align:left}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
@@ -103,56 +54,35 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   .icon-grid{grid-template-columns:repeat(3,1fr);max-height:220px}
 }
 
-/* final readability/marker fix */
-.sidebar label{font-size:17px!important;font-weight:700!important}
-.sidebar input,.sidebar select,.sidebar textarea,.sidebar button{font-size:17px!important;padding:12px 14px!important}
-.sidebar .small{font-size:15px!important;line-height:1.7!important}
+/* icon filter + direct icon selection */
+.icon-btn.active,.iconBtn.active{
+  outline:3px solid #22d3ee!important;
+  background:#0e7490!important;
+  box-shadow:0 0 0 3px rgba(34,211,238,.25)!important;
+}
+.icon-btn:active,.iconBtn:active{transform:scale(.97)}
+
+
+/* crisp vector marker icons */
+.svg-icon{
+  width:28px;
+  height:28px;
+  display:inline-block;
+  vertical-align:middle;
+}
+.marker .svg-icon{
+  width:30px;
+  height:30px;
+  display:block;
+}
+.icon-btn .svg-icon{
+  width:30px;
+  height:30px;
+  margin-bottom:4px;
+}
 .marker{
-  position:absolute;
-  transform:translate(-50%,-100%) scale(var(--marker-scale,1));
-  transform-origin:center bottom;
-  background:rgba(255,255,255,.92);
-  border:2px solid rgba(0,0,0,.85);
-  border-radius:999px;
-  padding:4px;
-  cursor:grab;
-  font-size:24px!important;
-  line-height:1;
-  filter:drop-shadow(0 2px 5px rgba(0,0,0,.95));
-  width:auto;
-  min-width:34px;
-  min-height:34px;
-  touch-action:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  image-rendering:auto;
 }
-
-
-.icon-btn.active{
-  outline:3px solid #22d3ee!important;
-  background:#0e7490!important;
-  box-shadow:0 0 0 3px rgba(34,211,238,.25);
-}
-.icon-btn:active{transform:scale(.97)}
-
-
-/* keep dropdown and direct icon click */
-.icon-btn.active,.iconBtn.active{
-  outline:3px solid #22d3ee!important;
-  background:#0e7490!important;
-  box-shadow:0 0 0 3px rgba(34,211,238,.25)!important;
-}
-.icon-btn:active,.iconBtn:active{transform:scale(.97)}
-
-
-/* group icon picker fix */
-.icon-btn.active,.iconBtn.active{
-  outline:3px solid #22d3ee!important;
-  background:#0e7490!important;
-  box-shadow:0 0 0 3px rgba(34,211,238,.25)!important;
-}
-.icon-btn:active,.iconBtn:active{transform:scale(.97)}
 
 </style>
 </head>
@@ -160,7 +90,7 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 <div class="app">
 <aside class="sidebar">
   <div class="title">GTAV 私人地圖</div>
-  <div class="subtitle">所有人打開都能看到公開標記；新增/移動/修改/刪除都先存在自己本機，只有手動按「上傳同步」才需要 Token 並公開給大家。</div>
+  <div class="subtitle">所有人打開都能看到公開標記；新增/修改/刪除會先存在自己本機，按「上傳同步」才公開給大家。</div>
 
   <div class="card">
     <label>地圖樣式</label>
@@ -179,18 +109,18 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   <div class="card">
     <label>你的名字（會顯示誰標記）</label>
     <input id="playerName" placeholder="例如 BYWAY" />
-    <label>標記圖案系列</label>
-    <select id="iconGroupSelect" onchange="renderIconGroup(this.value)">
+    <label>圖案篩選</label>
+    <select id="iconFilterSelect" onchange="renderIconGrid(this.value)">
       
+<option value="all">全部圖案</option>
 <option value="work">工作 / 產業</option>
 <option value="fish">漁業 / 釣魚</option>
 <option value="shop">商店 / 服務</option>
 <option value="public">公共設施</option>
-<option value="crime">特殊 / 犯罪</option>
 <option value="custom">常用 / 自訂</option>
 
     </select>
-    <div class="small warn">上方選單是「圖案系列」；下面會顯示該系列圖案。直接點下面圖案即可切換目前標記圖示。</div>
+    <div class="small warn">上方只是篩選分類，不會直接選圖案；下面顯示該分類圖案，點下面圖案才會切換目前要新增的圖標。</div>
     <div id="iconGrid" class="icon-grid"></div>
 
 <label>自訂圖示（可留空）</label>
@@ -275,49 +205,87 @@ function setMarkerBucket(list){allMarkers[activeMap]=list;saveLocalData()}
 function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMarkers));localStorage.setItem("gtav_active_map",activeMap);localStorage.setItem("gtav_selected_icon",selectedIcon)}
 function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
 function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
-function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null&&$("playerName"))$("playerName").value=n;if(t!==null&&$("ghToken"))$("ghToken").value=t}
-const ICON_GROUPS = {"work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🧼", "高壓清洗工"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"], ["🛒", "漁具店"]], "shop": [["🛒", "商店"], ["🧺", "伐木工商店"], ["🚗", "二手車商"], ["🚕", "車輛經銷商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"], ["💗", "甜點店"], ["✂️", "理髮廳"], ["👕", "服飾店"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"]], "crime": [["🔫", "武器商人"], ["🚩", "AFTERLIFE'S TUNER"], ["🛠️", "怪獸車廠"], ["✈️", "飛機扣押場"], ["🧰", "置物櫃"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["💰", "錢袋"], ["⭐", "自訂"]]};
-function renderIconGroup(groupName){
-  localStorage.setItem('gtav_icon_group', groupName);
-  const groupSelect = $('iconGroupSelect');
-  if (groupSelect) groupSelect.value = groupName;
-  const group = ICON_GROUPS[groupName] || ICON_GROUPS.work;
+function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null)$("playerName").value=n;if(t!==null)$("ghToken").value=t}
+const ICON_GROUPS = {"all": [["🏠", "房子"], ["💎", "鑽石"], ["🐟", "魚"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🪓", "伐木中心"], ["🎣", "漁業中心"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🚜", "農場管理員"], ["🪝", "釣魚佈告欄"], ["🪵", "鋸木廠"], ["🧭", "導航點"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🛒", "商店"], ["🏥", "醫院"], ["🛡️", "警局"], ["🏛️", "市政廳"], ["🔧", "機械師"], ["🔫", "武器商人"], ["⚡", "電力維修工"], ["🏨", "飯店"], ["📍", "一般標記"]], "work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"]], "shop": [["🛒", "商店"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["💰", "錢袋"], ["⭐", "自訂"]]};
+
+function iconMarkup(icon){
+  const map = {
+    "🏠": ["#38bdf8","M4 14 L14 5 L24 14 V26 H17 V18 H11 V26 H4 Z"],
+    "💎": ["#22d3ee","M14 3 L25 10 L14 27 L3 10 Z M7 10 H21 M10 10 L14 27 M18 10 L14 27"],
+    "🐟": ["#38bdf8","M5 15 C9 8 18 8 23 15 C18 22 9 22 5 15 Z M23 15 L29 10 V20 Z"],
+    "📄": ["#e5e7eb","M7 3 H19 L25 9 V29 H7 Z M19 3 V10 H25 M11 15 H21 M11 20 H21"],
+    "📱": ["#60a5fa","M9 2 H23 A2 2 0 0 1 25 4 V28 A2 2 0 0 1 23 30 H9 A2 2 0 0 1 7 28 V4 A2 2 0 0 1 9 2 Z M13 26 H19"],
+    "🏭": ["#f97316","M3 27 H29 V12 L22 16 V12 L15 16 V12 L8 16 V7 H3 Z M7 21 H11 M14 21 H18 M21 21 H25"],
+    "🪓": ["#f59e0b","M5 26 L22 9 M20 5 L28 10 L24 16 L17 11 Z"],
+    "🎣": ["#60a5fa","M10 4 C22 8 24 20 16 25 C11 28 7 24 10 20 M10 4 C8 12 9 18 13 21"],
+    "⛏️": ["#facc15","M7 25 L23 9 M10 6 C16 2 23 4 28 10 M12 6 L26 20"],
+    "💠": ["#06b6d4","M14 3 L25 14 L14 29 L3 14 Z M14 8 L20 14 L14 24 L8 14 Z"],
+    "🚜": ["#22c55e","M4 22 A5 5 0 1 0 14 22 A5 5 0 1 0 4 22 M20 24 A3 3 0 1 0 26 24 A3 3 0 1 0 20 24 M9 17 H18 L15 9 H10 Z M17 17 H25 V21 H18"],
+    "🪝": ["#38bdf8","M18 3 V19 C18 27 8 27 8 19 C8 15 12 15 12 19"],
+    "🪵": ["#a16207","M5 19 C7 10 20 6 27 11 C25 20 13 25 5 19 Z M9 19 C12 18 14 16 15 13"],
+    "🧭": ["#f97316","M16 3 A13 13 0 1 0 16 29 A13 13 0 1 0 16 3 M20 10 L17 19 L11 22 L14 13 Z"],
+    "🚗": ["#ef4444","M5 20 H27 L24 13 H8 Z M8 23 A3 3 0 1 0 14 23 A3 3 0 1 0 8 23 M20 23 A3 3 0 1 0 26 23 A3 3 0 1 0 20 23"],
+    "🅿️": ["#2563eb","M6 4 H26 V28 H6 Z M12 23 V9 H18 C25 9 25 18 18 18 H12 M12 9 H18"],
+    "🛒": ["#f97316","M5 6 H9 L12 20 H25 L28 10 H11 M13 25 A2 2 0 1 0 17 25 A2 2 0 1 0 13 25 M23 25 A2 2 0 1 0 27 25 A2 2 0 1 0 23 25"],
+    "🏥": ["#ef4444","M5 8 H27 V28 H5 Z M14 12 H18 V17 H23 V21 H18 V26 H14 V21 H9 V17 H14 Z"],
+    "🛡️": ["#38bdf8","M16 3 L27 7 V15 C27 23 21 28 16 30 C11 28 5 23 5 15 V7 Z"],
+    "🏛️": ["#e5e7eb","M4 12 H28 L16 4 Z M7 14 H10 V25 H7 Z M14 14 H17 V25 H14 Z M22 14 H25 V25 H22 Z M5 27 H27"],
+    "🔧": ["#cbd5e1","M22 4 C26 8 26 14 22 18 L13 27 L8 22 L17 13 C15 9 18 5 22 4 Z"],
+    "🔫": ["#22c55e","M4 13 H22 L27 16 V20 H18 L15 27 H10 L13 20 H4 Z"],
+    "⚡": ["#facc15","M18 2 L7 18 H15 L12 30 L25 12 H17 Z"],
+    "🏨": ["#f43f5e","M6 5 H26 V29 H6 Z M11 10 H14 M18 10 H21 M11 15 H14 M18 15 H21 M11 20 H14 M18 20 H21"],
+    "📍": ["#ef4444","M16 2 C10 2 6 6 6 12 C6 21 16 30 16 30 C16 30 26 21 26 12 C26 6 22 2 16 2 Z M16 8 A4 4 0 1 0 16 16 A4 4 0 1 0 16 8"],
+    "💰": ["#facc15","M10 10 C6 14 5 19 6 24 C8 30 24 30 26 24 C27 19 26 14 22 10 Z M12 4 H20 L18 10 H14 Z M16 14 V25 M12 17 C12 14 20 14 20 17 C20 20 12 19 12 22 C12 25 20 25 20 22"],
+    "⭐": ["#facc15","M16 3 L20 12 L30 12 L22 18 L25 28 L16 22 L7 28 L10 18 L2 12 L12 12 Z"]
+  };
+  const item = map[icon] || ["#94a3b8","M16 3 A13 13 0 1 0 16 29 A13 13 0 1 0 16 3"];
+  const color = item[0];
+  const path = item[1];
+  return `<svg class="svg-icon" viewBox="0 0 32 32" aria-hidden="true">
+    <circle cx="16" cy="16" r="15" fill="white" stroke="black" stroke-width="2"/>
+    <path d="${path}" fill="${color}" stroke="black" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function renderIconGrid(filterName){
+  const groupName = filterName || localStorage.getItem("gtav_icon_filter") || "all";
+  localStorage.setItem("gtav_icon_filter", groupName);
+
+  const select = $("iconFilterSelect");
+  if (select) select.value = groupName;
+
   const grid = $("iconGrid");
   if (!grid) return;
 
-  grid.innerHTML = group.map(([icon, name]) => `
+  const list = ICON_GROUPS[groupName] || ICON_GROUPS.all;
+  grid.innerHTML = list.map(([icon, name]) => `
     <button type="button" class="icon-btn" data-icon="${icon}" onclick="selectIcon('${icon}')" title="${name}">
-      ${icon}<span>${name}</span>
+      ${iconMarkup(icon)}<span>${name}</span>
     </button>
   `).join("");
 
-  const hasSelected = group.some(([icon]) => icon === selectedIcon);
-  if (!hasSelected && group.length) {
-    selectedIcon = group[0][0];
-    localStorage.setItem("gtav_selected_icon", selectedIcon);
-  }
-  selectIcon(selectedIcon, false);
+  updateIconActiveState();
 }
 
-function selectIcon(icon, showStatus = true){
-  selectedIcon = icon;
-
+function updateIconActiveState(){
   document.querySelectorAll(".icon-btn,.iconBtn").forEach(btn => {
     const btnIcon = btn.getAttribute("data-icon") || "";
-    btn.classList.toggle("active", btnIcon === icon);
+    btn.classList.toggle("active", btnIcon === selectedIcon);
   });
+}
 
+function selectIcon(icon){
+  selectedIcon = icon;
   localStorage.setItem("gtav_selected_icon", icon);
-  if (showStatus) {
-    setStatus("目前選擇圖案：" + icon + "，點地圖即可新增這個圖標。", "ok");
-  }
+  updateIconActiveState();
+  setStatus("目前選擇圖案：" + icon + "，點地圖即可新增這個圖標。", "ok");
 }
 
 function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
-function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.22,Math.min(.52,.28*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.34,Math.min(.85,.42*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
 function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
@@ -331,7 +299,7 @@ viewer.addEventListener("touchstart",e=>{if(isControlTarget(e.target))return;if(
 viewer.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchInfo){e.preventDefault();const[a,b]=e.touches,r=viewer.getBoundingClientRect(),dist=Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,pinchInfo.scale*(dist/pinchInfo.dist)));viewState.x=cx-pinchInfo.imageX*viewState.scale;viewState.y=cy-pinchInfo.imageY*viewState.scale;applyView()}},{passive:false});
 viewer.addEventListener("touchend",()=>{pinchInfo=null;dragInfo.blocked=false});
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
-function renderMarkers(){stage.querySelectorAll(".marker").forEach(e=>e.remove());const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.style.left=(marker.xPct*imgSize.w/100)+"px";btn.style.top=(marker.yPct*imgSize.h/100)+"px";btn.innerHTML=`${marker.icon}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span></span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});stage.appendChild(btn)});$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${m.icon} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
+function renderMarkers(){stage.querySelectorAll(".marker").forEach(e=>e.remove());const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.style.left=(marker.xPct*imgSize.w/100)+"px";btn.style.top=(marker.yPct*imgSize.h/100)+"px";btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span></span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;btn.setPointerCapture(e.pointerId)});btn.addEventListener("click",e=>{e.stopPropagation();if(suppressNextMarkerClick){suppressNextMarkerClick=false;return}openEditModal(marker.id)});stage.appendChild(btn)});$("markerCount").textContent=`目前地圖共有 ${markers.length} 個標記`;$("markerList").innerHTML=markers.map(m=>`<button type="button" class="marker-item" onclick="openEditModal('${m.id}')"><div><strong>${iconMarkup(m.icon)} ${escapeHtml(m.name)}</strong></div><div class="small">標記者：${escapeHtml(m.owner||"未命名")}${m.note?"｜"+escapeHtml(m.note):""}</div></button>`).join("")}
 window.addEventListener("pointermove",e=>{if(!movingMarkerId)return;e.preventDefault();movingMarkerMoved=true;const point=screenToImage(e.clientX,e.clientY),markers=getMarkerBucket(),m=markers.find(x=>x.id===movingMarkerId);if(!m)return;m.xPct=point.xPct;m.yPct=point.yPct;setMarkerBucket(markers);renderMarkers()},{passive:false});
 window.addEventListener("pointerup",()=>{if(!movingMarkerId)return;if(movingMarkerMoved){suppressNextMarkerClick=true;setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}movingMarkerId=null;movingMarkerMoved=false;setTimeout(()=>suppressNextMarkerClick=false,80)});
 function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();$("deleteBtn").style.display="none";modal.style.display="flex"}
@@ -342,9 +310,10 @@ function deleteMarker(){if(!editingMarkerId)return;setMarkerBucket(getMarkerBuck
 function b64encodeUtf8(str){return btoa(unescape(encodeURIComponent(str)))}
 function b64decodeUtf8(str){return decodeURIComponent(escape(atob(str)))}
 async function loadPublicMarkers(confirmOverwrite=false){try{if(confirmOverwrite&&Object.values(allMarkers).some(a=>Array.isArray(a)&&a.length>0)&&!confirm("重新讀取會覆蓋你目前本機標記，確定？"))return;setStatus("讀取公開標記中...","warn");const res=await fetch(`markers.json?v=${Date.now()}`,{cache:"no-store"});if(!res.ok)throw new Error(await res.text());const text=await res.text();const parsed=text.trim()?JSON.parse(text):{};allMarkers=Array.isArray(parsed)?{[activeMap]:parsed}:(parsed||{});saveLocalData();renderMarkers();setStatus("已讀取公開標記；你可以本機編輯，公開請按「上傳同步」。","ok")}catch(e){console.error(e);setStatus("讀取公開標記失敗；保留目前本機標記。","bad")}}
-async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳同步失敗；本機標記仍保留。請確認 Token 有 Contents Read and write 權限。","bad");alert("上傳同步失敗：請確認 Token 有 Contents Read and write 權限。平常新增/移動/刪除仍會保留在本機。")}}
+async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限","bad");alert("上傳失敗：請確認 Token 有 Contents Read and write 權限")}}
 window.addEventListener("resize",resetView);
-loadLocalData();loadSettings();renderIconGroup(localStorage.getItem('gtav_icon_group') || 'work');switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
+loadLocalData();loadSettings();renderIconGrid(localStorage.getItem('gtav_icon_filter') || 'all');
+selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
 </script>
 </body>
 </html>
