@@ -11,10 +11,10 @@
     .sidebar { border-right: 1px solid #243047; background: #101827; padding: 14px; overflow: auto; }
     .viewer { position: relative; overflow: hidden; background: #243845; touch-action: none; }
     .card { background: #0f172a; border: 1px solid #2d3c57; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
-    .title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-    .subtitle { font-size: 15px; color: #c7d2fe; line-height: 1.5; }
-    label { display: block; font-size: 15px; margin: 8px 0 4px; color: #dbeafe; }
-    input, select, textarea, button { width: 100%; border-radius: 12px; border: 1px solid #334155; background: #111c31; color: white; padding: 10px 12px; font-size: 15px; }
+    .title { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #c7d2fe; line-height: 1.5; }
+    label { display: block; font-size: 13px; margin: 8px 0 4px; color: #dbeafe; }
+    input, select, textarea, button { width: 100%; border-radius: 12px; border: 1px solid #334155; background: #111c31; color: white; padding: 10px 12px; font-size: 14px; }
     textarea { min-height: 90px; resize: vertical; }
     button { cursor: pointer; font-weight: 700; background: #0891b2; border: none; }
     .muted-btn { background: #334155; }
@@ -22,7 +22,7 @@
     .row { display: flex; gap: 8px; }
     .row > * { flex: 1; }
     .icon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 260px; overflow: auto; margin-top: 8px; }
-    .icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 62px; font-size: 20px; background: #1e293b; border: 1px solid #334155; padding: 8px 6px; }
+    .icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 62px; font-size: 22px; background: #1e293b; border: 1px solid #334155; padding: 8px 6px; }
     .icon-btn span { font-size: 11px; line-height: 1.2; text-align: center; color: #d1d5db; font-weight: 500; }
     .icon-btn.active { outline: 2px solid #22d3ee; background: #0e7490; }
     .topbar { position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; gap: 8px; pointer-events: auto; }
@@ -48,30 +48,13 @@
       .topbar { top: 8px; right: 8px; }
       .topbar button { padding: 8px 10px; }
     }
-  
-    .hidden-sync-field { display: none !important; }
-    .login-note { font-size: 15px; color:#fde68a; line-height:1.7; margin-top:8px; }
-
-  
-    @media(max-width:850px){
-      .app{grid-template-columns:1fr;grid-template-rows:52vh 48vh}
-      .sidebar{order:1;max-height:52vh;font-size:15px}
-      .viewer{order:2}
-      .card{padding:12px;margin:9px 0}
-      input,select,textarea,button{font-size:15px;padding:11px 12px}
-      .small{font-size:14px;line-height:1.65}
-      .topbar{top:8px;right:8px}
-      .topbar button{padding:8px 11px}
-      .icon-grid{grid-template-columns:repeat(4,1fr);max-height:220px}
-    }
-
   </style>
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
       <div class="title">GTAV 私人地圖</div>
-      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記。外面的人只能重新讀取標記；要標記/修改/刪除，必須填名字與 GitHub Token。</div>
+      <div class="subtitle">可切換 3 張地圖、可新增 / 刪除 / 命名標記。外面的人只能讀取公開標記；要標記/修改/刪除，必須填名字與 GitHub Token。</div>
 
       <div class="card">
         <label>地圖樣式</label>
@@ -218,7 +201,6 @@
 
         <label>GitHub Token（標記必填）</label>
         <input id="ghToken" type="password" placeholder="要標記時貼 github_pat_ Token" />
-        <div class="login-note">填好名字與 Token 後按「儲存設定」，會顯示登入中。按「重新讀取標記」等於刷新大家已同步的圖示。</div>
         <div class="small status-warn">外面的人可以直接重新讀取標記；要新增、移動、修改、刪除標記，必須填名字與 GitHub Token。</div>
         <div class="row" style="margin-top:8px;">
           <button type="button" onclick="saveSettings()">儲存設定</button>
@@ -293,6 +275,7 @@
     let editingMarkerId = null;
     let pendingPoint = null;
     let githubSha = null;
+    let githubWriteReady = false;
 
     let viewState = { scale: 1, x: 0, y: 0 };
     let imgSize = { w: 1, h: 1 };
@@ -343,38 +326,16 @@
 
     function saveSettings() {
       ["playerName","ghToken"].forEach(id => {
-        const el = $(id);
-        if (el) localStorage.setItem("gtav_" + id, el.value);
+        localStorage.setItem("gtav_" + id, $(id).value);
       });
-
-      const player = $("playerName")?.value.trim();
-      const token = $("ghToken")?.value.trim();
-
-      if (player && token) {
-        setStatus("已儲存設定，目前登入中：" + player, "ok");
-      } else if (player && !token) {
-        setStatus("已儲存名字；目前是觀看模式，標記需要 Token", "warn");
-      } else {
-        setStatus("請先填你的名字；標記需要 Token", "warn");
-      }
+      setStatus("設定已儲存", "ok");
     }
 
     function loadSettings() {
       ["playerName","ghToken"].forEach(id => {
-        const el = $(id);
         const v = localStorage.getItem("gtav_" + id);
-        if (el && v !== null) el.value = v;
+        if (v !== null) $(id).value = v;
       });
-
-      // 固定同步目標
-      if ($("ghOwner")) $("ghOwner").value = "BYwayJu";
-      if ($("ghRepo")) $("ghRepo").value = "gtav-map";
-      if ($("ghBranch")) $("ghBranch").value = "main";
-      if ($("ghPath")) $("ghPath").value = "markers.json";
-
-      const player = $("playerName")?.value.trim();
-      const token = $("ghToken")?.value.trim();
-      if (player && token) setStatus("已載入設定，目前登入中：" + player, "ok");
     }
 
     function setStatus(text, type="warn") {
@@ -649,6 +610,7 @@
         }
         // 只允許在圖片本體、且不是外圍藍色背景的位置新增標記
         if (!isPointAllowedForMarker(e.clientX, e.clientY)) return;
+        if (!canEditMarkers(true)) return;
         pendingPoint = screenToImage(e.clientX, e.clientY);
         openCreateModal();
       }
@@ -870,7 +832,8 @@
 
     function canEditMarkers(showAlert = true) {
       const cfg = getGithubConfig();
-      const player = $("playerName").value.trim();
+      const player = $("playerName")?.value?.trim() || "";
+
       if (!player) {
         if (showAlert) {
           alert("請先填你的名字，這樣大家才知道是誰標記。");
@@ -878,23 +841,32 @@
         }
         return false;
       }
+
       if (!cfg.token) {
         if (showAlert) {
-          alert("要新增、移動、修改、刪除標記，請先填 GitHub Token，並按「重新讀取標記」。");
+          alert("要新增、移動、修改、刪除標記，請先填 GitHub Token，然後按「重新讀取標記」登入。");
           $("ghToken").focus();
         }
         return false;
       }
+
+      if (!githubWriteReady) {
+        if (showAlert) {
+          alert("請先按「重新讀取標記」。成功顯示登入中後，才可以新增、移動、修改、刪除。");
+        }
+        return false;
+      }
+
       return true;
     }
 
     function getGithubConfig() {
       return {
-        owner: "BYwayJu",
-        repo: "gtav-map",
-        branch: "main",
-        path: "markers.json",
-        token: $("ghToken") ? $("ghToken").value.trim() : "",
+        owner: ($("ghOwner")?.value || "BYwayJu").trim(),
+        repo: ($("ghRepo")?.value || "gtav-map").trim(),
+        branch: ($("ghBranch")?.value || "main").trim(),
+        path: ($("ghPath")?.value || "markers.json").trim(),
+        token: $("ghToken").value.trim(),
       };
     }
 
@@ -908,11 +880,12 @@
 
     async function loadFromGithub() {
       const cfg = getGithubConfig();
+      githubWriteReady = false;
 
       try {
-        setStatus("讀取公開標記中...", "warn");
+        setStatus("讀取標記中...", "warn");
 
-        // 有 Token：用 GitHub API 讀取，之後可以寫入
+        // 有 Token：用 GitHub API 讀取；成功後才允許新增/移動/修改/刪除。
         if (cfg.token) {
           const url = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
           const res = await fetch(url, {
@@ -929,26 +902,27 @@
           let raw = "";
           try {
             raw = b64decodeUtf8(String(data.content || "").replace(/\n/g, ""));
-          } catch (decodeErr) {
+          } catch {
             raw = "{}";
           }
 
           let parsed = {};
           try {
             parsed = raw.trim() ? JSON.parse(raw) : {};
-          } catch (parseErr) {
+          } catch {
             parsed = {};
           }
 
           allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
           renderMarkers();
 
+          githubWriteReady = true;
           const userName = $("playerName")?.value?.trim() || "未命名";
-          setStatus("已登入中：" + userName + "；已讀取 GitHub 標記，可新增/修改/刪除", "ok");
+          setStatus("已登入中：" + userName + "；現在可以新增/移動/修改/刪除標記", "ok");
           return;
         }
 
-        // 沒 Token：直接讀公開 markers.json。{} 代表目前公開標記是 0 個，是正常狀態。
+        // 沒 Token：只讀公開 markers.json，只能看不能改。
         const res = await fetch(`markers.json?v=${Date.now()}`, { cache: "no-store" });
         if (!res.ok) throw new Error(await res.text());
 
@@ -956,37 +930,29 @@
         let parsed = {};
         try {
           parsed = text.trim() ? JSON.parse(text) : {};
-        } catch (parseErr) {
+        } catch {
           parsed = {};
         }
 
         allMarkers = Array.isArray(parsed) ? { [activeMap]: parsed } : (parsed || {});
         renderMarkers();
-
-        setStatus("已讀取公開標記；目前公開標記數量可能是 0。要新增/修改/刪除請填 Token。", "ok");
+        setStatus("已讀取公開標記；未填 Token 只能觀看", "ok");
       } catch (err) {
         console.error(err);
-        // 不再跳出煩人的視窗；只在左側狀態列顯示
-        allMarkers = {};
-        renderMarkers();
-        setStatus("讀取公開標記失敗；已先用空白標記列表啟動", "warn");
+        githubWriteReady = false;
+        setStatus("讀取失敗：Token 權限不足或 repo 權限不正確", "bad");
       }
     }
 
     async function pushToGithub(message) {
       const cfg = getGithubConfig();
-      if (!cfg.owner || !cfg.repo || !cfg.token) {
-        setStatus("未填 Token，不能新增/修改/刪除標記", "bad");
-        alert("要新增、移動、修改、刪除標記，請先填你的名字與 GitHub Token，並按「重新讀取標記」。");
-        await loadFromGithub();
-        return;
-      }
+      if (!canEditMarkers(true)) return;
 
       try {
         setStatus("同步到 GitHub 中...", "warn");
 
-        // 先讀取最新 SHA，避免多人修改時 PUT 失敗
-        const getUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}?ref=${cfg.branch}`;
+        // 先讀最新 SHA，避免多人同時修改造成衝突
+        const getUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main`;
         const getRes = await fetch(getUrl, {
           headers: {
             Authorization: `Bearer ${cfg.token}`,
@@ -994,14 +960,15 @@
           }
         });
         if (!getRes.ok) throw new Error(await getRes.text());
+
         const current = await getRes.json();
         githubSha = current.sha;
 
-        const putUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
+        const putUrl = `https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json`;
         const body = {
           message,
           content: b64encodeUtf8(JSON.stringify(allMarkers, null, 2)),
-          branch: cfg.branch,
+          branch: "main",
           sha: githubSha
         };
 
@@ -1013,6 +980,7 @@
           },
           body: JSON.stringify(body)
         });
+
         if (!putRes.ok) throw new Error(await putRes.text());
 
         const putData = await putRes.json();
@@ -1020,8 +988,9 @@
         setStatus("已同步到 GitHub；其他人重新讀取後可看到", "ok");
       } catch (err) {
         console.error(err);
-        setStatus("同步失敗：請確認 Token 有 Contents Read and write 權限", "bad");
-        alert("同步失敗：請確認 Token 有 Contents Read and write 權限，且你有此 repo 權限。");
+        githubWriteReady = false;
+        setStatus("同步失敗：Token 沒有 Contents Read and write 或沒有 repo 權限", "bad");
+        // 不跳出視窗；重新讀取公開資料，避免畫面上留下未同步成功的標記
         await loadFromGithub();
       }
     }
@@ -1035,7 +1004,7 @@
     if (filterSelect) filterSelect.value = activeFilter;
     selectIcon(selectedIcon);
     switchMap(activeMap);
-    setTimeout(() => loadFromGithub(), 1200);
+    setTimeout(() => loadFromGithub(), 500);
   </script>
 </body>
 </html>
