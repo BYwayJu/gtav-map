@@ -34,7 +34,7 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
 .hint{position:absolute;left:12px;bottom:12px;z-index:10;padding:8px 10px;border-radius:12px;background:rgba(15,23,42,.88);border:1px solid #334155;color:#cbd5e1;font-size:13px}
 #stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #stage img{display:block;user-select:none;-webkit-user-drag:none;max-width:none}
-.marker{position:absolute;transform:translate(-50%,-100%) scale(var(--marker-scale,1));transform-origin:center bottom;background:transparent;border:none;padding:0;cursor:grab;font-size:16px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));width:auto;touch-action:none}
+.marker{position:absolute;transform:translate(-50%,-100%) scale(var(--marker-scale,1));transform-origin:center bottom;background:transparent;border:none;padding:0;cursor:grab;font-size:14px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.9));width:auto;touch-action:none}
 .marker:active{cursor:grabbing}
 .marker-label{display:none;margin-top:2px;white-space:nowrap;border-radius:10px;background:rgba(15,23,42,.92);border:1px solid #334155;padding:4px 8px;transform:translateX(-32%);text-align:center;line-height:1.25}
 .marker:hover .marker-label,.marker:focus .marker-label{display:block}
@@ -53,13 +53,20 @@ button{cursor:pointer;font-weight:800;background:#0891b2;border:none}
   .small{font-size:14px}
   .icon-grid{grid-template-columns:repeat(3,1fr);max-height:220px}
 }
+
+/* final readability/marker fix */
+.sidebar label{font-size:17px!important;font-weight:700!important}
+.sidebar input,.sidebar select,.sidebar textarea,.sidebar button{font-size:17px!important;padding:12px 14px!important}
+.sidebar .small{font-size:15px!important;line-height:1.7!important}
+.marker{font-size:14px!important}
+
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
   <div class="title">GTAV 私人地圖</div>
-  <div class="subtitle">所有人打開都能看到公開標記；新增/修改/刪除會先存在自己本機，按「上傳同步」才公開給大家。</div>
+  <div class="subtitle">所有人打開都能看到公開標記；新增/移動/修改/刪除都先存在自己本機，只有手動按「上傳同步」才需要 Token 並公開給大家。</div>
 
   <div class="card">
     <label>地圖樣式</label>
@@ -211,13 +218,13 @@ function setMarkerBucket(list){allMarkers[activeMap]=list;saveLocalData()}
 function saveLocalData(){localStorage.setItem(getLocalKey(),JSON.stringify(allMarkers));localStorage.setItem("gtav_active_map",activeMap);localStorage.setItem("gtav_selected_icon",selectedIcon)}
 function loadLocalData(){try{allMarkers=JSON.parse(localStorage.getItem(getLocalKey())||"{}")}catch{allMarkers={}}}
 function saveSettings(){localStorage.setItem("gtav_playerName",$("playerName").value);localStorage.setItem("gtav_ghToken",$("ghToken").value);setStatus("設定已儲存。本機標記可用；要公開請按「上傳同步」。","ok")}
-function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null)$("playerName").value=n;if(t!==null)$("ghToken").value=t}
+function loadSettings(){const n=localStorage.getItem("gtav_playerName"),t=localStorage.getItem("gtav_ghToken");if(n!==null&&$("playerName"))$("playerName").value=n;if(t!==null&&$("ghToken"))$("ghToken").value=t}
 function selectIcon(icon){selectedIcon=icon;$("iconSelect").value=icon;document.querySelectorAll(".icon-btn").forEach(b=>b.classList.toggle("active",b.textContent.includes(icon)));localStorage.setItem("gtav_selected_icon",icon)}
 function switchMap(name){activeMap=name;$("mapSelect").value=name;mapImage.src=name+"?v="+Date.now();saveLocalData()}
 mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};imageMaskCanvas.width=imgSize.w;imageMaskCanvas.height=imgSize.h;imageMaskCtx.drawImage(mapImage,0,0);function sample(x,y){const d=imageMaskCtx.getImageData(Math.max(0,Math.min(imgSize.w-1,x)),Math.max(0,Math.min(imgSize.h-1,y)),1,1).data;return[d[0],d[1],d[2]]}const p=[sample(5,5),sample(imgSize.w-6,5),sample(5,imgSize.h-6),sample(imgSize.w-6,imgSize.h-6)];bgColor=[0,1,2].map(i=>Math.round(p.reduce((s,a)=>s+a[i],0)/4));resetView();renderMarkers()};
 function resetView(){const r=viewer.getBoundingClientRect();const s=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=s;baseScale=s;viewState.x=(r.width-imgSize.w*s)/2;viewState.y=(r.height-imgSize.h*s)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
-function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.045,Math.min(.14,.055*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
+function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;const zr=Math.max(.01,viewState.scale/Math.max(baseScale,.01));const ds=Math.max(.12,Math.min(.34,.15*Math.sqrt(zr)));stage.style.setProperty("--marker-scale",String(ds/viewState.scale))}
 function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
@@ -242,7 +249,7 @@ function deleteMarker(){if(!editingMarkerId)return;setMarkerBucket(getMarkerBuck
 function b64encodeUtf8(str){return btoa(unescape(encodeURIComponent(str)))}
 function b64decodeUtf8(str){return decodeURIComponent(escape(atob(str)))}
 async function loadPublicMarkers(confirmOverwrite=false){try{if(confirmOverwrite&&Object.values(allMarkers).some(a=>Array.isArray(a)&&a.length>0)&&!confirm("重新讀取會覆蓋你目前本機標記，確定？"))return;setStatus("讀取公開標記中...","warn");const res=await fetch(`markers.json?v=${Date.now()}`,{cache:"no-store"});if(!res.ok)throw new Error(await res.text());const text=await res.text();const parsed=text.trim()?JSON.parse(text):{};allMarkers=Array.isArray(parsed)?{[activeMap]:parsed}:(parsed||{});saveLocalData();renderMarkers();setStatus("已讀取公開標記；你可以本機編輯，公開請按「上傳同步」。","ok")}catch(e){console.error(e);setStatus("讀取公開標記失敗；保留目前本機標記。","bad")}}
-async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限","bad");alert("上傳失敗：請確認 Token 有 Contents Read and write 權限")}}
+async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳同步失敗；本機標記仍保留。請確認 Token 有 Contents Read and write 權限。","bad");alert("上傳同步失敗：請確認 Token 有 Contents Read and write 權限。平常新增/移動/刪除仍會保留在本機。")}}
 window.addEventListener("resize",resetView);
 loadLocalData();loadSettings();selectIcon(selectedIcon);switchMap(activeMap);setTimeout(()=>loadPublicMarkers(false),500);
 </script>
