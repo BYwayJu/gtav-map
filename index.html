@@ -144,7 +144,7 @@ pointer-events:auto;
       <option value="map-roadmap.png">Roadmap</option>
     </select>
     <div class="row" style="margin-top:8px">
-      <button type="button" onclick="zoomBy(1.2)">放大</button>
+      <button type="button" onclick="zoomBy(1.35)">放大</button>
       <button type="button" onclick="zoomBy(0.83)">縮小</button>
       <button type="button" class="muted-btn" onclick="resetView()">重置</button>
     </div>
@@ -163,7 +163,7 @@ pointer-events:auto;
       <option value="public">公共設施</option>
       <option value="custom">常用 / 自訂</option>
     </select>
-    <div class="small warn">上方只是篩選分類；下面點圖案才會切換目前標記圖示。</div>
+    <div class="small warn">上方只是篩選分類；下面點圖案才會切換目前標記圖示。已加入 🗑️ Delete / 刪除 圖示。</div>
     <div id="iconGrid" class="icon-grid"></div>
 
     <label>自訂圖示（可留空）</label>
@@ -190,13 +190,13 @@ pointer-events:auto;
 
 <main id="viewer" class="viewer">
   <div id="topbar" class="topbar">
-    <button type="button" onclick="zoomBy(1.2)">＋</button>
+    <button type="button" onclick="zoomBy(1.35)">＋</button>
     <button type="button" onclick="zoomBy(0.83)">－</button>
     <button type="button" onclick="resetView()">重置</button>
   </div>
   <div id="stage"><img id="mapImage" alt="map" draggable="false"></div>
   <div id="markerLayer"></div>
-  <div class="hint">清晰圖示層｜圖示不跟地圖一起變糊｜手機：單指拖曳、雙指縮放</div>
+  <div class="hint">清晰圖示層｜圖示不跟地圖一起變糊｜手機：單指拖曳、雙指可深度放大</div>
 </main>
 </div>
 
@@ -210,12 +210,12 @@ pointer-events:auto;
       <button type="button" onclick="saveMarker()">儲存</button>
       <button type="button" class="muted-btn" onclick="closeModal()">取消</button>
     </div>
-    <button id="deleteBtn" type="button" class="danger" style="margin-top:10px;display:none" onclick="deleteMarker()">刪除標記</button>
+    <button id="deleteBtn" type="button" class="danger" style="margin-top:10px;display:none" onclick="deleteMarker()">🗑️ Delete / 刪除標記</button>
   </div>
 </div>
 
 <script>
-const ICON_GROUPS = {"all": [["🏠", "房子"], ["💎", "鑽石"], ["🐟", "魚"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🪓", "伐木中心"], ["🎣", "漁業中心"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🚜", "農場管理員"], ["🪝", "釣魚佈告欄"], ["🪵", "鋸木廠"], ["🧭", "導航點"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🛒", "商店"], ["🏥", "醫院"], ["🛡️", "警局"], ["🏛️", "市政廳"], ["🔧", "機械師"], ["🔫", "武器商人"], ["⚡", "電力維修工"], ["🏨", "飯店"], ["📍", "一般標記"]], "work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"]], "shop": [["🛒", "商店"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["💰", "錢袋"], ["⭐", "自訂"]]};
+const ICON_GROUPS = {"all": [["🏠", "房子"], ["💎", "鑽石"], ["🐟", "魚"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🪓", "伐木中心"], ["🎣", "漁業中心"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🚜", "農場管理員"], ["🪝", "釣魚佈告欄"], ["🪵", "鋸木廠"], ["🧭", "導航點"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🛒", "商店"], ["🏥", "醫院"], ["🛡️", "警局"], ["🏛️", "市政廳"], ["🔧", "機械師"], ["🔫", "武器商人"], ["⚡", "電力維修工"], ["🏨", "飯店"], ["📍", "一般標記"], ["🗑️", "Delete / 刪除"]], "work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"]], "shop": [["🛒", "商店"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"], ["🗑️", "Delete / 刪除"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🗑️", "Delete / 刪除"], ["💰", "錢袋"], ["🗑️", "Delete / 刪除"], ["⭐", "自訂"]]};
 const $=id=>document.getElementById(id);
 const viewer=$("viewer"),stage=$("stage"),mapImage=$("mapImage"),markerLayer=$("markerLayer"),modal=$("markerModal"),topbar=$("topbar");
 let activeMap=localStorage.getItem("gtav_active_map")||"map-atlas.png";
@@ -259,17 +259,17 @@ mapImage.onload=()=>{imgSize={w:mapImage.naturalWidth,h:mapImage.naturalHeight};
 function resetView(){const r=viewer.getBoundingClientRect(),sc=Math.max(r.width/imgSize.w,r.height/imgSize.h);viewState.scale=sc;baseScale=sc;viewState.x=(r.width-imgSize.w*sc)/2;viewState.y=(r.height-imgSize.h*sc)/2;applyView()}
 function clampView(){const r=viewer.getBoundingClientRect(),sw=imgSize.w*viewState.scale,sh=imgSize.h*viewState.scale;if(sw<=r.width)viewState.x=(r.width-sw)/2;else viewState.x=Math.min(60,Math.max(r.width-sw-60,viewState.x));if(sh<=r.height)viewState.y=(r.height-sh)/2;else viewState.y=Math.min(60,Math.max(r.height-sh-60,viewState.y))}
 function applyView(){clampView();stage.style.transform=`translate(${viewState.x}px,${viewState.y}px) scale(${viewState.scale})`;positionMarkers()}
-function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
+function zoomAt(f,cx,cy){const bx=(cx-viewState.x)/viewState.scale,by=(cy-viewState.y)/viewState.scale;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*24,viewState.scale*f));viewState.x=cx-bx*viewState.scale;viewState.y=cy-by*viewState.scale;applyView()}
 function zoomBy(f){const r=viewer.getBoundingClientRect();zoomAt(f,r.width/2,r.height/2)}
 function screenToImage(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;return{xPct:Math.max(0,Math.min(100,x/imgSize.w*100)),yPct:Math.max(0,Math.min(100,y/imgSize.h*100))}}
 function isPointAllowed(cx,cy){const r=viewer.getBoundingClientRect(),x=(cx-r.left-viewState.x)/viewState.scale,y=(cy-r.top-viewState.y)/viewState.scale;if(x<0||x>imgSize.w||y<0||y>imgSize.h)return false;const d=imageMaskCtx.getImageData(Math.round(x),Math.round(y),1,1).data;const dist=Math.sqrt((d[0]-bgColor[0])**2+(d[1]-bgColor[1])**2+(d[2]-bgColor[2])**2);return dist>38}
 function isControlTarget(t){return!!t.closest("button,input,select,textarea,.topbar,.sidebar,.modal")}
-viewer.addEventListener("wheel",e=>{if(isControlTarget(e.target))return;e.preventDefault();const r=viewer.getBoundingClientRect();zoomAt(e.deltaY<0?1.12:.89,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+viewer.addEventListener("wheel",e=>{if(isControlTarget(e.target))return;e.preventDefault();const r=viewer.getBoundingClientRect();zoomAt(e.deltaY<0?1.18:.86,e.clientX-r.left,e.clientY-r.top)},{passive:false});
 viewer.addEventListener("pointerdown",e=>{if(isControlTarget(e.target)||e.target.closest(".marker")||movingMarkerId){dragInfo.blocked=true;return}viewer.setPointerCapture(e.pointerId);dragInfo={active:true,moved:false,x:e.clientX,y:e.clientY,blocked:false}});
 viewer.addEventListener("pointermove",e=>{if(!dragInfo.active||dragInfo.blocked||pinchInfo)return;const dx=e.clientX-dragInfo.x,dy=e.clientY-dragInfo.y;if(Math.abs(dx)+Math.abs(dy)>4)dragInfo.moved=true;viewState.x+=dx;viewState.y+=dy;dragInfo.x=e.clientX;dragInfo.y=e.clientY;applyView()});
 viewer.addEventListener("pointerup",e=>{if(dragInfo.blocked||isControlTarget(e.target)||e.target.closest(".marker")){dragInfo.active=false;dragInfo.blocked=false;return}if(!dragInfo.active)return;dragInfo.active=false;if(!dragInfo.moved&&!pinchInfo){if(!$("playerName").value.trim()){alert("請先填你的名字");$("playerName").focus();return}if(!isPointAllowed(e.clientX,e.clientY))return;pendingPoint=screenToImage(e.clientX,e.clientY);openCreateModal()}});
 viewer.addEventListener("touchstart",e=>{if(isControlTarget(e.target))return;if(e.touches.length===2){e.preventDefault();dragInfo.active=false;dragInfo.blocked=true;const[a,b]=e.touches,r=viewer.getBoundingClientRect(),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;pinchInfo={dist:Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),scale:viewState.scale,imageX:(cx-viewState.x)/viewState.scale,imageY:(cy-viewState.y)/viewState.scale}}},{passive:false});
-viewer.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchInfo){e.preventDefault();const[a,b]=e.touches,r=viewer.getBoundingClientRect(),dist=Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*8,pinchInfo.scale*(dist/pinchInfo.dist)));viewState.x=cx-pinchInfo.imageX*viewState.scale;viewState.y=cy-pinchInfo.imageY*viewState.scale;applyView()}},{passive:false});
+viewer.addEventListener("touchmove",e=>{if(e.touches.length===2&&pinchInfo){e.preventDefault();const[a,b]=e.touches,r=viewer.getBoundingClientRect(),dist=Math.max(1,Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)),cx=((a.clientX+b.clientX)/2)-r.left,cy=((a.clientY+b.clientY)/2)-r.top;viewState.scale=Math.max(baseScale*.65,Math.min(baseScale*24,pinchInfo.scale*(dist/pinchInfo.dist)));viewState.x=cx-pinchInfo.imageX*viewState.scale;viewState.y=cy-pinchInfo.imageY*viewState.scale;applyView()}},{passive:false});
 viewer.addEventListener("touchend",()=>{pinchInfo=null;dragInfo.blocked=false});
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
 function positionMarkers(){document.querySelectorAll(".marker").forEach(btn=>{const x=Number(btn.dataset.xpct)*imgSize.w*viewState.scale/100+viewState.x;const y=Number(btn.dataset.ypct)*imgSize.h*viewState.scale/100+viewState.y;btn.style.left=x+"px";btn.style.top=y+"px"})}
