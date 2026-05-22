@@ -20,7 +20,8 @@
       "name": "空頭補給聯絡人",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779377805188
+      "createdAt": 1779377805188,
+      "locked": true
     },
     {
       "id": "9c094825-f27e-414d-975a-56b8d602a153",
@@ -31,7 +32,8 @@
       "note": "需要通行證",
       "owner": "BYwayJu",
       "createdAt": 1779377830035,
-      "updatedAt": 1779379115557
+      "updatedAt": 1779379115557,
+      "locked": true
     },
     {
       "id": "a345b47d-953e-4aad-a376-0f19d4e3e309",
@@ -41,17 +43,8 @@
       "name": "空投補給聯絡人(2階段)",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779377999607
-    },
-    {
-      "id": "df9b17df-3425-4072-a454-95279646dea4",
-      "xPct": 35.89298959945284,
-      "yPct": 77.33172233819452,
-      "icon": "🏚️",
-      "name": "沙威瑪的車庫",
-      "note": "",
-      "owner": "BYwayJu",
-      "createdAt": 1779378085006
+      "createdAt": 1779377999607,
+      "locked": true
     },
     {
       "id": "22371332-8d06-499e-ac82-5b2c91d2fc15",
@@ -61,7 +54,8 @@
       "name": "沙威瑪店",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779378120499
+      "createdAt": 1779378120499,
+      "locked": true
     },
     {
       "id": "21a99b01-398c-446b-b75b-5a14feb52cf2",
@@ -72,7 +66,8 @@
       "note": "需要通行證",
       "owner": "BYwayJu",
       "createdAt": 1779378310285,
-      "updatedAt": 1779379127676
+      "updatedAt": 1779379127676,
+      "locked": true
     },
     {
       "id": "eecba893-87fc-4eea-90ea-a3e187875ba3",
@@ -82,7 +77,8 @@
       "name": "海上走私(在B1層)",
       "note": "(需要通行證)",
       "owner": "BYwayJu",
-      "createdAt": 1779379109287
+      "createdAt": 1779379109287,
+      "locked": true
     },
     {
       "id": "e02eb758-572b-46e5-bb2d-60c76487ec25",
@@ -92,27 +88,8 @@
       "name": "密醫",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779379205517
-    },
-    {
-      "id": "dfa5aef1-a32b-4dd4-adac-f93333e1585d",
-      "xPct": 47.19457671791346,
-      "yPct": 11.779568210332236,
-      "icon": "👩🏻‍⚕️",
-      "name": "密醫",
-      "note": "",
-      "owner": "BYwayJu",
-      "createdAt": 1779379320977
-    },
-    {
-      "id": "e2204454-cc37-4866-96dc-1121324166d8",
-      "xPct": 43.34399978577802,
-      "yPct": 55.36970508123724,
-      "icon": "👩🏻‍⚕️",
-      "name": "密醫",
-      "note": "",
-      "owner": "BYwayJu",
-      "createdAt": 1779379352209
+      "createdAt": 1779379205517,
+      "locked": true
     },
     {
       "id": "420eb74a-f238-40be-a18f-f07c069eb270",
@@ -122,7 +99,8 @@
       "name": "修理工(1000元)",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779379876251
+      "createdAt": 1779379876251,
+      "locked": true
     },
     {
       "id": "38bd1812-49cd-486f-950d-1f92de79ca31",
@@ -132,7 +110,8 @@
       "name": "收購郵件(不一定出現 聽說3位)",
       "note": "1張信25元?",
       "owner": "BYwayJu",
-      "createdAt": 1779379946953
+      "createdAt": 1779379946953,
+      "locked": true
     },
     {
       "id": "e227cb24-e819-4018-afae-324467a7fd3a",
@@ -142,7 +121,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380138828
+      "createdAt": 1779380138828,
+      "locked": true
     },
     {
       "id": "3994554e-c63c-4023-837a-c7e6cc064b5f",
@@ -152,7 +132,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380153575
+      "createdAt": 1779380153575,
+      "locked": true
     },
     {
       "id": "8809c5c7-c94e-4a4d-9478-9201df28bd9f",
@@ -162,7 +143,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380167992
+      "createdAt": 1779380167992,
+      "locked": true
     },
     {
       "id": "8163fb2b-28d3-40ec-a401-a3d17d39619c",
@@ -172,7 +154,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380178371
+      "createdAt": 1779380178371,
+      "locked": true
     },
     {
       "id": "fe675dc4-b1fc-4881-8f18-11718c3ae374",
@@ -182,7 +165,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380205931
+      "createdAt": 1779380205931,
+      "locked": true
     },
     {
       "id": "d9164a59-2c3b-4364-ab88-f09c7958eb8b",
@@ -192,7 +176,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380212776
+      "createdAt": 1779380212776,
+      "locked": true
     },
     {
       "id": "13a0a678-62c9-4303-b799-ab77443725e9",
@@ -202,7 +187,8 @@
       "name": "35%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380224229
+      "createdAt": 1779380224229,
+      "locked": true
     },
     {
       "id": "6dbfc1cc-df43-4998-9500-7adef34b52ce",
@@ -212,17 +198,8 @@
       "name": "55%",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380244825
-    },
-    {
-      "id": "0e089847-1564-4469-83ad-0daead64fe20",
-      "xPct": 57.91507842510579,
-      "yPct": 31.579227997833836,
-      "icon": "🍁",
-      "name": "100%",
-      "note": "",
-      "owner": "BYwayJu",
-      "createdAt": 1779380260086
+      "createdAt": 1779380244825,
+      "locked": true
     },
     {
       "id": "eed94b30-d409-441a-8328-4dd2976b5a00",
@@ -232,7 +209,328 @@
       "name": "這是我們家 這很重要",
       "note": "",
       "owner": "BYwayJu",
-      "createdAt": 1779380567086
+      "createdAt": 1779380567086,
+      "locked": true
+    },
+    {
+      "id": "211494b6-a540-454a-8425-fe04972ec0c2",
+      "xPct": 43.46050456894521,
+      "yPct": 55.27123879328063,
+      "icon": "👩‍⚕️💜",
+      "name": "我們家的專屬密醫",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779472998435
+    },
+    {
+      "id": "21b24c03-a719-48ab-99bb-6eb78b147bf2",
+      "xPct": 47.222624345031676,
+      "yPct": 11.998150190430286,
+      "icon": "👩‍⚕️💜",
+      "name": "紫色專屬密醫",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779473217286
+    },
+    {
+      "id": "f81e8268-7d82-4c96-a423-12d50baf0220",
+      "xPct": 56.71701046957441,
+      "yPct": 84.20579216995274,
+      "icon": "🔧",
+      "name": "修車工(1000元)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779473323932
+    },
+    {
+      "id": "3b41c936-6d89-4467-9721-5121af874b6e",
+      "xPct": 57.2985893836128,
+      "yPct": 83.76780567263204,
+      "icon": "👨🏿",
+      "name": "新黑市",
+      "note": "販賣一樣物品",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779473513977
+    },
+    {
+      "id": "1f074ce7-0a2d-491e-bf77-0bcad1f8d8a5",
+      "xPct": 41.74138954347043,
+      "yPct": 76.3321698911949,
+      "icon": "🚓",
+      "name": "警察局",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779473593887
+    },
+    {
+      "id": "3e2e9d3e-9cc6-4f95-a13b-dbdca68659f9",
+      "xPct": 36.06411805570484,
+      "yPct": 94.66001612795354,
+      "icon": "🚁",
+      "name": "直升機租借",
+      "note": "各5千 2種",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779473826562
+    },
+    {
+      "id": "5169a3b7-c193-4ce5-9793-a09dc970449e",
+      "xPct": 39.85492417021211,
+      "yPct": 78.06433409284675,
+      "icon": "⚓",
+      "name": "租船點(4種)",
+      "note": "租4千  押2千\n租6千5 押3千\n租5千  押3千\n租5千  押3千",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779473933818,
+      "updatedAt": 1779474286504
+    },
+    {
+      "id": "1c4f9592-413a-4939-b7f2-f8b718fc3b62",
+      "xPct": 46.37448491682803,
+      "yPct": 70.58757230945268,
+      "icon": "🏥",
+      "name": "醫院",
+      "note": "繃帶400 5/5\n止痛藥 300 5/5",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779474839646
+    },
+    {
+      "id": "e9a25559-0f22-4f9f-8e5f-23190ca21431",
+      "xPct": 55.15321185796457,
+      "yPct": 73.74570084725815,
+      "icon": "🔧",
+      "name": "修車工(1000)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779474858807
+    },
+    {
+      "id": "0fe951a5-be85-4c28-97f8-7113019b9c9d",
+      "xPct": 46.70101956680916,
+      "yPct": 64.80343457533957,
+      "icon": "🔧",
+      "name": "修車工(1000)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779474927073
+    },
+    {
+      "id": "363e7ab3-0fba-4cc2-a2ce-8d751bf8c2d5",
+      "xPct": 48.98905311609557,
+      "yPct": 64.80343457533957,
+      "icon": "🏪",
+      "name": "超商(獲取衝鋒槍合約)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779475125313
+    },
+    {
+      "id": "b726fb98-bb67-461a-bba9-00de689deebe",
+      "xPct": 45.98337910122995,
+      "yPct": 78.0863618794966,
+      "icon": "🏪",
+      "name": "超商(獲取衝鋒槍合約)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779475174545
+    },
+    {
+      "id": "9280e406-bf04-44c1-9226-adc19371e46b",
+      "xPct": 49.55015168679776,
+      "yPct": 82.58162764606935,
+      "icon": "⚡",
+      "name": "電工",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779475216784
+    },
+    {
+      "id": "9414bf1d-2956-48c2-a307-6d6ac5a0bff3",
+      "xPct": 49.41809056122938,
+      "yPct": 65.49628212854635,
+      "icon": "🏩",
+      "name": "公寓",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779475251090
+    },
+    {
+      "id": "2d1df5b8-0b6d-4fe9-ad32-27e73679f629",
+      "xPct": 46.04363302577233,
+      "yPct": 81.33201001529301,
+      "icon": "🏢",
+      "name": "百貨(行動充)",
+      "note": "1顆500",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779475317020
+    },
+    {
+      "id": "aee5f279-84eb-4830-bade-39cfe42ea917",
+      "xPct": 42.35506442709326,
+      "yPct": 84.89048513881801,
+      "icon": "🏎️",
+      "name": "租贓車點",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779476615508
+    },
+    {
+      "id": "97cd63c1-7463-4aa6-9f03-e00025f2a53e",
+      "xPct": 57.71181548491738,
+      "yPct": 31.347936655245267,
+      "icon": "🍄",
+      "name": "100%",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779476789077
+    },
+    {
+      "id": "835d9f65-9288-4334-a956-a858a50e536e",
+      "xPct": 53.18729416016678,
+      "yPct": 87.67514591316531,
+      "icon": "🦼",
+      "name": "AF車廠",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779476855313
+    },
+    {
+      "id": "3347d99e-9aa4-4dbd-82f3-976894a511c5",
+      "xPct": 41.90699106783139,
+      "yPct": 88.79586064133774,
+      "icon": "👩🏻‍⚕️",
+      "name": "密醫",
+      "note": "目前已知粉幫佔領",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779477196589
+    },
+    {
+      "id": "127e1a56-2c5e-431f-9221-bf11b6ae7fea",
+      "xPct": 36.88060262551366,
+      "yPct": 71.21212037439115,
+      "icon": "📝",
+      "name": "衝鋒槍合約老闆(最高層通風管)",
+      "note": "要爬樓梯 要組隊 記得別摔死",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779478502453
+    },
+    {
+      "id": "f5b8ebb7-b886-4d7d-9da1-9d6a9b5f0471",
+      "xPct": 62.991596318619024,
+      "yPct": 25.57301986653217,
+      "icon": "🌿",
+      "name": "35%",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779478655379
+    },
+    {
+      "id": "a2f78234-9604-4521-bc27-6c2cc0a17a18",
+      "xPct": 55.381721347643875,
+      "yPct": 70.54379611282286,
+      "icon": "🍀",
+      "name": "毒品老闆",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479129172
+    },
+    {
+      "id": "36691367-0ee9-45c8-9d34-a826d55e1167",
+      "xPct": 34.26147258557794,
+      "yPct": 70.6337339883181,
+      "icon": "🔧",
+      "name": "修車老闆(1000元)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479182423
+    },
+    {
+      "id": "cc26cc99-37dd-4d42-9119-46df662e257d",
+      "xPct": 50.23926774541536,
+      "yPct": 68.72641893086283,
+      "icon": "👾",
+      "name": "怪獸車廠",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479434250
+    },
+    {
+      "id": "d1bedd7d-8a5b-4bdc-94da-b7664e91cb5e",
+      "xPct": 59.66761370876923,
+      "yPct": 28.802834791095393,
+      "icon": "❓",
+      "name": "未知",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479511743
+    },
+    {
+      "id": "28f328ed-6637-44b6-958a-d1f4a2d10ba8",
+      "xPct": 45.94337186433009,
+      "yPct": 89.88087961643052,
+      "icon": "❓",
+      "name": "未知",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479523847
+    },
+    {
+      "id": "5bd0df5a-a02a-4ce6-b00e-0e17dca6c8a9",
+      "xPct": 38.138087486329056,
+      "yPct": 44.84787087141931,
+      "icon": "❓",
+      "name": "未知",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479539949
+    },
+    {
+      "id": "8c07d811-9ca8-4127-8140-d88628737160",
+      "xPct": 72.64413720018486,
+      "yPct": 25.688362900208126,
+      "icon": "❓",
+      "name": "未知",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479775785
+    },
+    {
+      "id": "f5d80441-c848-417c-9f3e-10a146a0dcdb",
+      "xPct": 45.526388321313114,
+      "yPct": 15.370344350298081,
+      "icon": "❓",
+      "name": "未知",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779479875833
     }
   ]
 }
