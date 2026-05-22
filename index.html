@@ -32,7 +32,7 @@ textarea{min-height:88px;resize:vertical}
 #markerLayer{position:absolute;inset:0;z-index:20;pointer-events:none}
 .marker{
 position:absolute;
-transform:translate(-50%,-50%) scale(var(--item-scale,1));
+transform:translate(-50%,-50%);
 background:transparent;
 border:none;
 padding:0;
@@ -154,17 +154,8 @@ pointer-events:auto;
 .marker{
   z-index:1;
 }
-.marker:hover,
-.marker:focus,
-.marker.active-marker{
-  z-index:99999 !important;
-}
-.marker:hover .marker-label,
-.marker:focus .marker-label,
-.marker.active-marker .marker-label{
-  display:block !important;
-  z-index:100000 !important;
-}
+.marker:hover,.marker:focus{z-index:99999!important}
+.marker:hover .marker-label,.marker:focus .marker-label{display:block!important;z-index:100000!important}
 .marker-label{
   z-index:100000 !important;
 }
@@ -254,9 +245,6 @@ pointer-events:auto;
     <div id="markerOwnerInfo" class="small" style="margin-top:6px"></div>
     <label>更換圖示</label>
     <select id="editMarkerIcon"></select>
-    <label>圖案大小</label>
-    <input id="markerScale" type="range" min="0.5" max="2.5" step="0.1" value="1" oninput="updateMarkerScaleText(this.value)">
-    <div id="markerScaleText" class="small">目前大小：1.0x</div>
     <div class="small warn">可在這裡直接把已放好的標記換成其他圖示，不用刪掉重放。</div>
     <label>備註</label><textarea id="markerNote" placeholder="可換行輸入備註，例如：\n押4千\n押2千\n租5千"></textarea>
     <div class="row" style="margin-top:10px">
@@ -341,18 +329,23 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":
 function positionMarkers(){document.querySelectorAll(".marker").forEach(btn=>{const x=Number(btn.dataset.xpct)*imgSize.w*viewState.scale/100+viewState.x;const y=Number(btn.dataset.ypct)*imgSize.h*viewState.scale/100+viewState.y;btn.style.left=x+"px";btn.style.top=y+"px"})}
 
 function bringMarkerToFront(btn){
-  document.querySelectorAll(".marker.active-marker").forEach(el=>{
-    el.classList.remove("active-marker");
-    el.style.zIndex = "";
+  document.querySelectorAll(".marker").forEach(el => {
+    if (el !== btn) el.style.zIndex = "";
   });
-  btn.classList.add("active-marker");
   btn.style.zIndex = "99999";
 }
 
-function renderMarkers(){markerLayer.innerHTML="";const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.style.setProperty("--item-scale", marker.scale || 1);btn.dataset.id=marker.id;btn.dataset.xpct=marker.xPct;btn.dataset.ypct=marker.yPct;btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${marker.locked === false ? "" : "🔒 "}${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span>${marker.note ? `<span class="marker-note">${escapeHtml(marker.note)}</span>` : ""}</span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;
+function clearMarkerFront(btn){
+  if (btn) btn.style.zIndex = "";
+}
+
+function renderMarkers(){markerLayer.innerHTML="";const markers=getMarkerBucket();markers.forEach(marker=>{const btn=document.createElement("button");btn.className="marker";btn.dataset.id=marker.id;btn.dataset.xpct=marker.xPct;btn.dataset.ypct=marker.yPct;btn.innerHTML=`${iconMarkup(marker.icon)}<span class="marker-label"><span class="marker-name">${marker.locked === false ? "" : "🔒 "}${escapeHtml(marker.name)}</span><span class="marker-owner">標記者：${escapeHtml(marker.owner||"未命名")}</span>${marker.note ? `<span class="marker-note">${escapeHtml(marker.note)}</span>` : ""}</span>`;btn.title=`${marker.name}｜${marker.owner||"未命名"}`;
 btn.addEventListener("pointerenter",()=>bringMarkerToFront(btn));
+btn.addEventListener("pointerleave",()=>clearMarkerFront(btn));
 btn.addEventListener("focus",()=>bringMarkerToFront(btn));
-btn.addEventListener("touchstart",()=>bringMarkerToFront(btn),{passive:true});btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();if(selectedIcon==="🗑️"){return}if (marker.locked !== false) {
+btn.addEventListener("blur",()=>clearMarkerFront(btn));
+btn.addEventListener("touchstart",()=>bringMarkerToFront(btn),{passive:true});
+btn.addEventListener("touchend",()=>setTimeout(()=>clearMarkerFront(btn),300),{passive:true});btn.addEventListener("pointerdown",e=>{e.stopPropagation();e.preventDefault();if(selectedIcon==="🗑️"){return}if (marker.locked !== false) {
   // 鎖定中的標記只能點擊編輯，不會因為滑動地圖而誤移動
   return;
 }
@@ -396,25 +389,12 @@ function populateEditIconSelect(currentIcon){
 
   sel.value = currentIcon || selectedIcon || "📍";
 }
-
-
-function updateMarkerScaleText(value){
-  const text = $("markerScaleText");
-  if(text) text.textContent = "目前大小：" + Number(value).toFixed(1) + "x";
 }
 
-function setModalScale(value){
-  const slider = $("markerScale");
-  if(slider){
-    slider.value = String(value || 1);
-    updateMarkerScaleText(slider.value);
-  }
-}
-
-function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();populateEditIconSelect(selectedIcon);setModalScale(1);if($("lockBtn")) $("lockBtn").style.display="none";$("deleteBtn").style.display="none";modal.style.display="flex"}
-function openEditModal(id){const m=getMarkerBucket().find(x=>x.id===id);if(!m)return;editingMarkerId=id;$("modalTitle").textContent="編輯標記";$("markerName").value=m.name;$("markerNote").value=m.note||"";$("markerOwnerInfo").textContent="標記者："+(m.owner||"未命名");populateEditIconSelect(m.icon);setModalScale(m.scale || 1);if($("lockBtn")){ $("lockBtn").style.display="block"; $("lockBtn").textContent = (m.locked === false ? "🔓 解鎖中｜點我上鎖" : "🔒 已上鎖｜點我解鎖"); } $("deleteBtn").style.display="block";modal.style.display="flex"}
+function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();populateEditIconSelect(selectedIcon);if($("lockBtn")) $("lockBtn").style.display="none";$("deleteBtn").style.display="none";modal.style.display="flex"}
+function openEditModal(id){const m=getMarkerBucket().find(x=>x.id===id);if(!m)return;editingMarkerId=id;$("modalTitle").textContent="編輯標記";$("markerName").value=m.name;$("markerNote").value=m.note||"";$("markerOwnerInfo").textContent="標記者："+(m.owner||"未命名");populateEditIconSelect(m.icon);if($("lockBtn")){ $("lockBtn").style.display="block"; $("lockBtn").textContent = (m.locked === false ? "🔓 解鎖中｜點我上鎖" : "🔒 已上鎖｜點我解鎖"); } $("deleteBtn").style.display="block";modal.style.display="flex"}
 function closeModal(){modal.style.display="none";editingMarkerId=null;pendingPoint=null}
-function saveMarker(){const name=$("markerName").value.trim();if(!name){alert("請輸入名稱");return}const markers=getMarkerBucket();if(editingMarkerId){const m=markers.find(x=>x.id===editingMarkerId);if(!m)return;m.name=name;m.note=$("markerNote").value.trim();if($("editMarkerIcon")) m.icon=$("editMarkerIcon").value;if($("markerScale")) m.scale=Number($("markerScale").value);m.updatedAt=Date.now()}else{const icon=$("customIcon").value.trim()||($("editMarkerIcon") ? $("editMarkerIcon").value : selectedIcon)||selectedIcon;markers.push({id:crypto.randomUUID(),xPct:pendingPoint.xPct,yPct:pendingPoint.yPct,icon,name,note:$("markerNote").value.trim(),owner:$("playerName").value.trim(),locked:true,scale:Number($("markerScale") ? $("markerScale").value : 1),createdAt:Date.now()})}setMarkerBucket(markers);renderMarkers();closeModal();setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}
+function saveMarker(){const name=$("markerName").value.trim();if(!name){alert("請輸入名稱");return}const markers=getMarkerBucket();if(editingMarkerId){const m=markers.find(x=>x.id===editingMarkerId);if(!m)return;m.name=name;m.note=$("markerNote").value.trim();if($("editMarkerIcon")) m.icon=$("editMarkerIcon").value;m.updatedAt=Date.now()}else{const icon=$("customIcon").value.trim()||($("editMarkerIcon") ? $("editMarkerIcon").value : selectedIcon)||selectedIcon;markers.push({id:crypto.randomUUID(),xPct:pendingPoint.xPct,yPct:pendingPoint.yPct,icon,name,note:$("markerNote").value.trim(),owner:$("playerName").value.trim(),locked:true,createdAt:Date.now()})}setMarkerBucket(markers);renderMarkers();closeModal();setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}
 
 
 function lockAllMarkers(){
