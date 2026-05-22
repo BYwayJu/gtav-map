@@ -76,7 +76,6 @@ pointer-events:auto;
   font-weight:700;
 }
 
-.icon-btn 
 .marker-list{display:flex;flex-direction:column;gap:8px}
 .marker-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;text-align:left}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
@@ -232,9 +231,9 @@ pointer-events:auto;
     <button type="button" onclick="zoomBy(0.83)">－</button>
     <button type="button" onclick="resetView()">重置</button>
   </div>
-  <div id="stage"><img id="mapImage" alt="map" draggable="false"></div>
+  <div id="stage"><img id="mapImage" alt="map" draggable="false" onerror="setStatus('地圖圖片讀取失敗：請確認 map-atlas.png / map-satellite.jpg / map-roadmap.png 檔名存在且正確。', 'bad')"></div>
   <div id="markerLayer"></div>
-  <div class="hint">清晰圖示層｜圖示不跟地圖一起變糊｜手機：單指拖曳、雙指可深度放大</div>
+  
 </main>
 </div>
 
@@ -388,7 +387,6 @@ function populateEditIconSelect(currentIcon){
   ).join("");
 
   sel.value = currentIcon || selectedIcon || "📍";
-}
 }
 
 function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();populateEditIconSelect(selectedIcon);if($("lockBtn")) $("lockBtn").style.display="none";$("deleteBtn").style.display="none";modal.style.display="flex"}
