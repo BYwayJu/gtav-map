@@ -531,6 +531,17 @@
       "owner": "BYwayJu",
       "locked": true,
       "createdAt": 1779479875833
+    },
+    {
+      "id": "1bbcc87d-59c9-42c8-81cc-61996accd543",
+      "xPct": 36.83388955044934,
+      "yPct": 79.0204936135235,
+      "icon": "✉️",
+      "name": "郵件老闆(不一定出現 聽說3位)",
+      "note": "1封25元???",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779480254669
     }
   ]
 }
