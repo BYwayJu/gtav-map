@@ -270,6 +270,39 @@ body.locked .app{display:none!important}
   }
 }
 
+
+.marker-extra-gallery{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:6px;
+  margin-top:6px;
+}
+.marker-extra-img{
+  display:block;
+  width:100%;
+  max-width:180px;
+  max-height:130px;
+  object-fit:contain;
+  margin:0 auto;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+}
+.marker-image-preview-list{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:8px;
+  margin-top:8px;
+}
+.marker-image-preview-list img{
+  width:100%;
+  max-height:120px;
+  object-fit:contain;
+  border-radius:8px;
+  border:1px solid #334155;
+  background:#0b1220;
+}
+
 </style>
 </head>
 <body class="locked">
@@ -395,10 +428,10 @@ body.locked .app{display:none!important}
     <div class="small warn">可以直接輸入你自己的圖示；有填自訂圖示時，會優先使用自訂圖示。</div>
     <div class="small warn">可在這裡直接把已放好的標記換成其他圖示，不用刪掉重放。</div>
     <label>備註</label><textarea id="markerNote" placeholder="可換行輸入備註，例如：\n押4千\n押2千\n租5千"></textarea>
-    <label>附加圖片網址（可留空）</label>
-    <input id="markerImageUrl" placeholder="例如 images/shop.png 或 https://...jpg" oninput="updateMarkerImagePreview()" />
-    <img id="markerImagePreview" class="marker-image-preview" alt="圖片預覽" />
-    <div class="small warn">這裡不是更換小圖示，是讓你點/滑到標記時，旁邊顯示額外圖片。圖片可放 GitHub repo 的 images 資料夾，再填 images/檔名.png。</div>
+    <label>附加圖片網址（可多張，一行一張）</label>
+    <textarea id="markerImageUrl" placeholder="例如：\nimages/shop1.png\nimages/shop2.jpg\nhttps://example.com/image.png" oninput="updateMarkerImagePreview()"></textarea>
+    <div id="markerImagePreview" class="marker-image-preview-list"></div>
+    <div class="small warn">這裡不是更換小圖示，是讓你點/滑到標記時顯示多張額外圖片。每行放一張圖片網址；圖片可放 GitHub repo 的 images 資料夾，再填 images/檔名.png。</div>
     <div class="row" style="margin-top:10px">
       <button type="button" onclick="saveMarker()">儲存</button>
       <button type="button" class="muted-btn" onclick="closeModal()">取消</button>
@@ -594,26 +627,39 @@ function updateSelectedIconPreview(){
 }
 
 
-function markerImageHtml(url){
-  const u = String(url || "").trim();
-  if(!u) return "";
-  const safe = escapeHtml(u);
-  return `<img class="marker-extra-img" src="${safe}" alt="附加圖片" loading="lazy" onerror="this.style.display='none'">`;
+function getMarkerImageUrls(value){
+  return String(value || "")
+    .split(/\n|,/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function markerImageHtml(urls){
+  const list = getMarkerImageUrls(urls);
+  if(!list.length) return "";
+  return `<div class="marker-extra-gallery">` + list.map(url => {
+    const safe = escapeHtml(url);
+    return `<img class="marker-extra-img" src="${safe}" alt="附加圖片" loading="lazy" onerror="this.style.display='none'">`;
+  }).join("") + `</div>`;
 }
 
 function updateMarkerImagePreview(){
   const input = $("markerImageUrl");
   const preview = $("markerImagePreview");
   if(!input || !preview) return;
-  const url = input.value.trim();
-  if(!url){
+  const list = getMarkerImageUrls(input.value);
+  if(!list.length){
+    preview.innerHTML = "";
     preview.style.display = "none";
-    preview.removeAttribute("src");
     return;
   }
-  preview.src = url;
-  preview.style.display = "block";
+  preview.style.display = "grid";
+  preview.innerHTML = list.map(url => {
+    const safe = escapeHtml(url);
+    return `<img src="${safe}" alt="圖片預覽" onerror="this.style.display='none'">`;
+  }).join("");
 }
+
 
 function populateEditIconSelect(currentIcon){
   const sel = $("editMarkerIcon");
