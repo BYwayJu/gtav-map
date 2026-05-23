@@ -159,9 +159,50 @@ pointer-events:auto;
   z-index:100000 !important;
 }
 
+
+/* Password gate */
+body.locked .app{display:none!important}
+#passwordGate{
+  position:fixed;inset:0;z-index:999999;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;background:linear-gradient(135deg,#07111f,#101827);
+  color:#fff;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;
+}
+#passwordGate.hidden{display:none!important}
+.gate-box{
+  width:min(420px,100%);background:#0f172a;border:1px solid #334155;
+  border-radius:20px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+.gate-title{font-size:26px;font-weight:900;margin:0 0 8px}
+.gate-desc{color:#cbd5e1;line-height:1.6;margin:0 0 16px;font-size:15px}
+#gatePassword{
+  width:100%;border-radius:12px;border:1px solid #475569;background:#111c31;
+  color:#fff;padding:13px 14px;font-size:18px;outline:none;
+}
+#gatePassword:focus{border-color:#22d3ee;box-shadow:0 0 0 3px rgba(34,211,238,.18)}
+.gate-row{display:flex;gap:10px;margin-top:12px}
+.gate-row button{width:100%;border:0;border-radius:12px;padding:13px 14px;font-size:17px;font-weight:900;cursor:pointer}
+.gate-login{background:#0891b2;color:#fff}
+.gate-remember{background:#334155;color:#fff}
+#gateError{min-height:22px;margin-top:10px;color:#fca5a5;font-size:14px;font-weight:700}
+
 </style>
 </head>
-<body>
+<body class="locked">
+
+<div id="passwordGate">
+  <div class="gate-box">
+    <h1 class="gate-title">私人地圖</h1>
+    <p class="gate-desc">請輸入密碼才能查看完整地圖與標記內容。</p>
+    <input id="gatePassword" type="password" placeholder="輸入密碼" autocomplete="current-password" />
+    <div class="gate-row">
+      <button class="gate-login" type="button" onclick="unlockSite(false)">進入</button>
+      <button class="gate-remember" type="button" onclick="unlockSite(true)">記住並進入</button>
+    </div>
+    <div id="gateError"></div>
+  </div>
+</div>
+
 <div class="app">
 <aside class="sidebar">
   <div class="title">GTAV 私人地圖</div>
@@ -220,6 +261,25 @@ pointer-events:auto;
   </div>
 
   <div class="card">
+    <b>如何取得 GitHub Token？</b>
+    <ol class="small" style="padding-left:20px; margin:10px 0 0; line-height:1.8;">
+      <li>打開 GitHub，點右上角頭像。</li>
+      <li>點 <b>Settings</b>。</li>
+      <li>左側滑到最下面，點 <b>Developer settings</b>。</li>
+      <li>點 <b>Personal access tokens</b>。</li>
+      <li>選 <b>Fine-grained tokens</b>。</li>
+      <li>點 <b>Generate new token</b>。</li>
+      <li><b>Repository access</b> 選 <b>Only select repositories</b>，選 <b>BYwayJu / gtav-map</b>。</li>
+      <li><b>Repository permissions</b> 找到 <b>Contents</b>，設成 <b>Read and write</b>。</li>
+      <li>按 <b>Generate token</b> 後，複製 <b>github_pat_</b> 開頭的 Token，貼到上方欄位。</li>
+    </ol>
+    <div class="small warn" style="margin-top:10px;">
+      Token 只會顯示一次，請不要公開給陌生人。平常看標記不需要 Token；只有按「上傳同步」才需要。
+    </div>
+  </div>
+
+
+  <div class="card">
     <div id="markerCount" class="small">目前地圖共有 0 個標記</div>
     <div id="markerList" class="marker-list" style="margin-top:8px"></div>
   </div>
@@ -255,6 +315,51 @@ pointer-events:auto;
 </div>
 
 <script>
+
+// ===== 密碼設定 =====
+const SITE_PASSWORD = "7254";
+// =====================
+
+(function initPasswordGate(){
+  const saved = localStorage.getItem("gtav_map_password_ok") === "yes";
+  const session = sessionStorage.getItem("gtav_map_password_ok") === "yes";
+  if(saved || session){
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.remove("locked");
+      const gate = document.getElementById("passwordGate");
+      if(gate) gate.classList.add("hidden");
+    });
+  }
+
+  window.unlockSite = function(remember){
+    const input = document.getElementById("gatePassword");
+    const error = document.getElementById("gateError");
+    const value = (input?.value || "").trim();
+
+    if(value === SITE_PASSWORD){
+      sessionStorage.setItem("gtav_map_password_ok","yes");
+      if(remember) localStorage.setItem("gtav_map_password_ok","yes");
+      document.body.classList.remove("locked");
+      const gate = document.getElementById("passwordGate");
+      if(gate) gate.classList.add("hidden");
+      return;
+    }
+
+    if(error) error.textContent = "密碼錯誤，請重新輸入。";
+    if(input){ input.value = ""; input.focus(); }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("gatePassword");
+    if(input){
+      input.focus();
+      input.addEventListener("keydown", (e) => {
+        if(e.key === "Enter") unlockSite(false);
+      });
+    }
+  });
+})();
+
 const ICON_GROUPS = {"all": [["🏠", "房子"], ["💎", "鑽石"], ["🐟", "魚"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🪓", "伐木中心"], ["🎣", "漁業中心"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"], ["🚜", "農場管理員"], ["🪝", "釣魚佈告欄"], ["🪵", "鋸木廠"], ["🧭", "導航點"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🛒", "商店"], ["🏥", "醫院"], ["🛡️", "警局"], ["🏛️", "市政廳"], ["🔧", "機械師"], ["🔫", "武器商人"], ["⚡", "電力維修工"], ["🏨", "飯店"], ["📍", "一般標記"], ["🗑️", "Delete / 刪除"]], "work": [["🪓", "伐木中心"], ["🪵", "鋸木廠"], ["🚜", "農場管理員"], ["⚡", "電力維修工"], ["🔧", "機械師"], ["⛏️", "礦業中心"], ["💠", "礦石清洗區"]], "fish": [["🎣", "漁業中心"], ["🪝", "釣魚佈告欄"], ["🐟", "魚"]], "shop": [["🛒", "商店"], ["🚗", "二手車商"], ["🅿️", "停車場"], ["🏨", "飯店"], ["🏥", "醫院"]], "public": [["🛡️", "警局"], ["🏛️", "市政廳"], ["🔐", "監獄"], ["⛪", "教堂"], ["🧭", "導航點"], ["📍", "一般標記"], ["🗑️", "Delete / 刪除"]], "custom": [["🏠", "房子"], ["💎", "鑽石"], ["📄", "紙張"], ["📱", "平板"], ["🏭", "托車廠"], ["🗑️", "Delete / 刪除"], ["💰", "錢袋"], ["🗑️", "Delete / 刪除"], ["⭐", "自訂"]]};
 const $=id=>document.getElementById(id);
 const viewer=$("viewer"),stage=$("stage"),mapImage=$("mapImage"),markerLayer=$("markerLayer"),modal=$("markerModal"),topbar=$("topbar");
