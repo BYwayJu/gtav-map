@@ -542,6 +542,51 @@
       "owner": "BYwayJu",
       "locked": true,
       "createdAt": 1779480254669
+    },
+    {
+      "id": "00d2f4d3-e47f-4f11-b80c-6f298a3aa1f7",
+      "xPct": 34.49893048627171,
+      "yPct": 78.2602019893742,
+      "icon": "⭐",
+      "name": "滑板車(早上7點至下午6點前會在)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779566639320,
+      "updatedAt": 1779566673196
+    },
+    {
+      "id": "e90f28cc-20e3-4346-9035-300bd32c71ba",
+      "xPct": 55.200854476083606,
+      "yPct": 45.94615047005664,
+      "icon": "🔧",
+      "name": "修車工(1000元)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779567309623
+    },
+    {
+      "id": "a7bbe85c-0a84-421b-8a0c-327d39edf4e1",
+      "xPct": 55.50714889558657,
+      "yPct": 43.77146009158564,
+      "icon": "🔧",
+      "name": "修車工(1000元)",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779567636219
+    },
+    {
+      "id": "baea7e0f-d6b8-433f-a0bb-76b0146cfa72",
+      "xPct": 50.89011846501839,
+      "yPct": 71.02303286689464,
+      "icon": "🐜",
+      "name": "這在\"下水道\"的假證件商人",
+      "note": "",
+      "owner": "BYwayJu",
+      "locked": true,
+      "createdAt": 1779567794410
     }
   ]
 }
