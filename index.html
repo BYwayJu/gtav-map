@@ -811,7 +811,16 @@ function toggleMarkerLock(){
 }
 
 function deleteMarker(){if(!editingMarkerId)return;setMarkerBucket(getMarkerBucket().filter(x=>x.id!==editingMarkerId));renderMarkers();closeModal();setStatus("已在本機刪除；要公開請按「上傳同步」。","warn")}
-function b64encodeUtf8(str){return btoa(unescape(encodeURIComponent(str)))}
+function b64encodeUtf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, chunk);
+  }
+  return btoa(binary);
+}
 async function loadPublicMarkers(confirmOverwrite=false){
   const keepName = $("playerName") ? $("playerName").value : "";
   const keepToken = $("ghToken") ? $("ghToken").value : "";
@@ -841,7 +850,106 @@ async function loadPublicMarkers(confirmOverwrite=false){
     setStatus("讀取公開標記失敗；Token 已保留，本機標記也保留。","bad");
   }
 }
-async function uploadSync(){const token=$("ghToken").value.trim();if(!token){alert("要上傳同步，請先填 GitHub Token");$("ghToken").focus();return}try{setStatus("上傳同步中...","warn");const getRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main",{headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"}});if(!getRes.ok)throw new Error(await getRes.text());const data=await getRes.json();const putRes=await fetch("https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json",{method:"PUT",headers:{Authorization:`Bearer ${token}`,Accept:"application/vnd.github+json"},body:JSON.stringify({message:"sync markers",content:b64encodeUtf8(JSON.stringify(allMarkers,null,2)),branch:"main",sha:data.sha})});if(!putRes.ok)throw new Error(await putRes.text());setStatus("已上傳同步；其他人重新整理或重新讀取後可看到。","ok");alert("已上傳同步")}catch(e){console.error(e);setStatus("上傳失敗：請確認 Token 有 Contents Read and write 權限","bad");alert("上傳失敗：請確認 Token 有 Contents Read and write 權限")}}
+async function uploadSync(){
+  const tokenInput = $("ghToken");
+  const token = (tokenInput?.value || localStorage.getItem("gtav_ghToken") || "").trim();
+
+  if(!token){
+    alert("要上傳同步，請先填 GitHub Token。");
+    if(tokenInput) tokenInput.focus();
+    return;
+  }
+
+  // 每次上傳前都重新保存 Token，避免編輯/重新讀取後被清掉
+  localStorage.setItem("gtav_ghToken", token);
+  if(tokenInput) tokenInput.value = token;
+
+  const getUrl = "https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json?ref=main";
+  const putUrl = "https://api.github.com/repos/BYwayJu/gtav-map/contents/markers.json";
+
+  async function readSha(){
+    const getRes = await fetch(getUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json"
+      }
+    });
+
+    if(!getRes.ok){
+      const errText = await getRes.text();
+      throw new Error(`讀取 GitHub SHA 失敗 HTTP ${getRes.status}: ${errText}`);
+    }
+
+    return await getRes.json();
+  }
+
+  async function putWithSha(sha){
+    const payload = JSON.stringify(allMarkers, null, 2);
+    const body = {
+      message: "sync markers",
+      content: b64encodeUtf8(payload),
+      branch: "main",
+      sha
+    };
+
+    const putRes = await fetch(putUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if(!putRes.ok){
+      const errText = await putRes.text();
+      const error = new Error(`寫入 GitHub 失敗 HTTP ${putRes.status}: ${errText}`);
+      error.status = putRes.status;
+      throw error;
+    }
+
+    return await putRes.json();
+  }
+
+  try{
+    setStatus("上傳同步中...", "warn");
+
+    let data = await readSha();
+
+    try{
+      await putWithSha(data.sha);
+    }catch(firstErr){
+      // 如果多人/自己連續上傳造成 SHA 衝突，重新讀最新 SHA 再試一次
+      if(firstErr.status === 409){
+        data = await readSha();
+        await putWithSha(data.sha);
+      }else{
+        throw firstErr;
+      }
+    }
+
+    setStatus("已上傳同步；Token 已保留，下次不用重貼。", "ok");
+    alert("已上傳同步。Token 已保留，下次不用重貼。");
+  }catch(e){
+    console.error(e);
+
+    // 不要再誤導成 Token 失效；顯示實際狀態
+    const msg = String(e.message || e);
+    setStatus("上傳同步失敗；Token 已保留。請看 Console 或檢查權限。", "bad");
+
+    let userMsg = "上傳同步失敗，但 Token 沒有失效、也已保留在這台裝置。\\n\\n";
+    if(msg.includes("HTTP 403")){
+      userMsg += "可能原因：Token 沒有 Contents Read and write，或沒有 BYwayJu/gtav-map 權限。";
+    }else if(msg.includes("HTTP 404")){
+      userMsg += "可能原因：Token 沒有選到 BYwayJu/gtav-map repo，或 repo/markers.json 路徑錯誤。";
+    }else if(msg.includes("HTTP 409")){
+      userMsg += "可能原因：多人同時上傳衝突，請先按「重新讀取標記」再上傳。";
+    }else{
+      userMsg += "錯誤內容：" + msg.slice(0, 500);
+    }
+    alert(userMsg);
+  }
+}
 window.addEventListener("resize",resetView);
 loadLocalData();
 loadSettings();
