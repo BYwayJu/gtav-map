@@ -237,6 +237,39 @@ body.locked .app{display:none!important}
   background:#0b1220;
 }
 
+
+/* Scrollable edit modal */
+.modal{
+  align-items:flex-start !important;
+  overflow:auto !important;
+  padding:18px !important;
+}
+.modal-box{
+  max-height:92vh !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  padding-bottom:22px !important;
+}
+.modal-box::-webkit-scrollbar{
+  width:10px;
+}
+.modal-box::-webkit-scrollbar-thumb{
+  background:#475569;
+  border-radius:999px;
+}
+.modal-box::-webkit-scrollbar-track{
+  background:#0f172a;
+}
+@media(max-width:900px){
+  .modal{
+    padding:10px !important;
+  }
+  .modal-box{
+    max-height:90vh !important;
+    width:100% !important;
+  }
+}
+
 </style>
 </head>
 <body class="locked">
