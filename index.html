@@ -303,6 +303,48 @@ body.locked .app{display:none!important}
   background:#0b1220;
 }
 
+
+/* Image lightbox for marker photos */
+#imageLightbox{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.86);
+  padding:18px;
+}
+#imageLightbox.open{
+  display:flex;
+}
+#imageLightbox img{
+  max-width:96vw;
+  max-height:92vh;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 18px 60px rgba(0,0,0,.7);
+  background:#111827;
+}
+#imageLightbox .lightbox-close{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:auto;
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  background:#991b1b;
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+}
+.marker-extra-img,
+.marker-image-preview-list img{
+  cursor:zoom-in;
+}
+
 </style>
 </head>
 <body class="locked">
@@ -438,6 +480,12 @@ body.locked .app{display:none!important}
     </div>
     <button id="deleteBtn" type="button" class="danger" style="margin-top:10px;display:none" onclick="deleteMarker()">🗑️ Delete / 刪除標記</button>
   </div>
+</div>
+
+
+<div id="imageLightbox" onclick="if(event.target.id==='imageLightbox') closeImageLightbox()">
+  <button class="lightbox-close" type="button" onclick="closeImageLightbox()">✕</button>
+  <img id="imageLightboxImg" alt="放大圖片">
 </div>
 
 <script>
@@ -627,6 +675,27 @@ function updateSelectedIconPreview(){
 }
 
 
+
+function openImageLightbox(url){
+  const box = $("imageLightbox");
+  const img = $("imageLightboxImg");
+  if(!box || !img || !url) return;
+  img.src = url;
+  box.classList.add("open");
+}
+
+function closeImageLightbox(){
+  const box = $("imageLightbox");
+  const img = $("imageLightboxImg");
+  if(!box || !img) return;
+  box.classList.remove("open");
+  img.removeAttribute("src");
+}
+
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") closeImageLightbox();
+});
+
 function getMarkerImageUrls(value){
   return String(value || "")
     .split(/\n|,/)
@@ -639,7 +708,7 @@ function markerImageHtml(urls){
   if(!list.length) return "";
   return `<div class="marker-extra-gallery">` + list.map(url => {
     const safe = escapeHtml(url);
-    return `<img class="marker-extra-img" src="${safe}" alt="附加圖片" loading="lazy" onerror="this.style.display='none'">`;
+    return `<img class="marker-extra-img" src="${safe}" alt="附加圖片" loading="lazy" onclick="event.stopPropagation(); openImageLightbox(\\'${safe}\\')" onerror="this.style.display=\\'none\\'">`;
   }).join("") + `</div>`;
 }
 
@@ -656,7 +725,7 @@ function updateMarkerImagePreview(){
   preview.style.display = "grid";
   preview.innerHTML = list.map(url => {
     const safe = escapeHtml(url);
-    return `<img src="${safe}" alt="圖片預覽" onerror="this.style.display='none'">`;
+    return `<img src="${safe}" alt="圖片預覽" onclick="event.stopPropagation(); openImageLightbox('${safe}')" onerror="this.style.display='none'">`;
   }).join("");
 }
 
