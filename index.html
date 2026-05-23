@@ -186,6 +186,31 @@ body.locked .app{display:none!important}
 .gate-remember{background:#334155;color:#fff}
 #gateError{min-height:22px;margin-top:10px;color:#fca5a5;font-size:14px;font-weight:700}
 
+
+.selected-icon-preview{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:8px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#0b1220;
+  border:1px solid #334155;
+  color:#fde68a;
+  font-size:16px;
+  font-weight:800;
+}
+#selectedIconPreviewIcon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  font-size:26px;
+  line-height:1;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif;
+}
+
 </style>
 </head>
 <body class="locked">
@@ -303,7 +328,11 @@ body.locked .app{display:none!important}
     <label>名稱</label><input id="markerName" placeholder="請輸入標記名稱">
     <div id="markerOwnerInfo" class="small" style="margin-top:6px"></div>
     <label>更換圖示</label>
-    <select id="editMarkerIcon"></select>
+    <select id="editMarkerIcon" onchange="updateSelectedIconPreview()"></select>
+    <div id="selectedIconPreview" class="selected-icon-preview">目前選擇：<span id="selectedIconPreviewIcon">📍</span></div>
+    <label>自訂更換圖示（可留空）</label>
+    <input id="editCustomIcon" placeholder="例如 🐱 / 💰 / 🚪，有填就用這個圖示" oninput="updateSelectedIconPreview()" />
+    <div class="small warn">可以直接輸入你自己的圖示；有填自訂圖示時，會優先使用自訂圖示。</div>
     <div class="small warn">可在這裡直接把已放好的標記換成其他圖示，不用刪掉重放。</div>
     <label>備註</label><textarea id="markerNote" placeholder="可換行輸入備註，例如：\n押4千\n押2千\n租5千"></textarea>
     <div class="row" style="margin-top:10px">
@@ -472,6 +501,16 @@ movingMarkerId=marker.id;movingMarkerMoved=false;suppressNextMarkerClick=false;b
 window.addEventListener("pointermove",e=>{if(!movingMarkerId)return;e.preventDefault();movingMarkerMoved=true;const point=screenToImage(e.clientX,e.clientY),markers=getMarkerBucket(),m=markers.find(x=>x.id===movingMarkerId);if(!m)return;m.xPct=point.xPct;m.yPct=point.yPct;setMarkerBucket(markers);renderMarkers()},{passive:false});
 window.addEventListener("pointerup",()=>{if(!movingMarkerId)return;if(movingMarkerMoved){suppressNextMarkerClick=true;setStatus("已移動標記並存在本機；要公開請按「上傳同步」。","warn")}movingMarkerId=null;movingMarkerMoved=false;setTimeout(()=>suppressNextMarkerClick=false,80)});
 
+
+function updateSelectedIconPreview(){
+  const preview = $("selectedIconPreviewIcon");
+  if(!preview) return;
+
+  const custom = $("editCustomIcon") ? $("editCustomIcon").value.trim() : "";
+  const selected = $("editMarkerIcon") ? $("editMarkerIcon").value : selectedIcon;
+  preview.textContent = custom || selected || "📍";
+}
+
 function populateEditIconSelect(currentIcon){
   const sel = $("editMarkerIcon");
   if(!sel || typeof ICON_GROUPS === "undefined") return;
@@ -492,12 +531,20 @@ function populateEditIconSelect(currentIcon){
   ).join("");
 
   sel.value = currentIcon || selectedIcon || "📍";
+  updateSelectedIconPreview();
 }
 
-function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();populateEditIconSelect(selectedIcon);if($("lockBtn")) $("lockBtn").style.display="none";$("deleteBtn").style.display="none";modal.style.display="flex"}
-function openEditModal(id){const m=getMarkerBucket().find(x=>x.id===id);if(!m)return;editingMarkerId=id;$("modalTitle").textContent="編輯標記";$("markerName").value=m.name;$("markerNote").value=m.note||"";$("markerOwnerInfo").textContent="標記者："+(m.owner||"未命名");populateEditIconSelect(m.icon);if($("lockBtn")){ $("lockBtn").style.display="block"; $("lockBtn").textContent = (m.locked === false ? "🔓 解鎖中｜點我上鎖" : "🔒 已上鎖｜點我解鎖"); } $("deleteBtn").style.display="block";modal.style.display="flex"}
+function openCreateModal(){editingMarkerId=null;$("modalTitle").textContent="新增標記";$("markerName").value="";$("markerNote").value="";if($("editCustomIcon")) { $("editCustomIcon").value=""; $("editCustomIcon").oninput = updateSelectedIconPreview; }$("markerOwnerInfo").textContent="標記者："+$("playerName").value.trim();populateEditIconSelect(selectedIcon);updateSelectedIconPreview();if($("lockBtn")) $("lockBtn").style.display="none";$("deleteBtn").style.display="none";modal.style.display="flex"}
+function openEditModal(id){const m=getMarkerBucket().find(x=>x.id===id);if(!m)return;editingMarkerId=id;$("modalTitle").textContent="編輯標記";$("markerName").value=m.name;$("markerNote").value=m.note||"";$("markerOwnerInfo").textContent="標記者："+(m.owner||"未命名");populateEditIconSelect(m.icon);
+if($("editCustomIcon")){
+  const sel = $("editMarkerIcon");
+  const existsInSelect = sel && Array.from(sel.options).some(o => o.value === m.icon);
+  $("editCustomIcon").value = existsInSelect ? "" : (m.icon || "");
+  $("editCustomIcon").oninput = updateSelectedIconPreview;
+  updateSelectedIconPreview();
+}if($("lockBtn")){ $("lockBtn").style.display="block"; $("lockBtn").textContent = (m.locked === false ? "🔓 解鎖中｜點我上鎖" : "🔒 已上鎖｜點我解鎖"); } $("deleteBtn").style.display="block";modal.style.display="flex"}
 function closeModal(){modal.style.display="none";editingMarkerId=null;pendingPoint=null}
-function saveMarker(){const name=$("markerName").value.trim();if(!name){alert("請輸入名稱");return}const markers=getMarkerBucket();if(editingMarkerId){const m=markers.find(x=>x.id===editingMarkerId);if(!m)return;m.name=name;m.note=$("markerNote").value.trim();if($("editMarkerIcon")) m.icon=$("editMarkerIcon").value;m.updatedAt=Date.now()}else{const icon=$("customIcon").value.trim()||($("editMarkerIcon") ? $("editMarkerIcon").value : selectedIcon)||selectedIcon;markers.push({id:crypto.randomUUID(),xPct:pendingPoint.xPct,yPct:pendingPoint.yPct,icon,name,note:$("markerNote").value.trim(),owner:$("playerName").value.trim(),locked:true,createdAt:Date.now()})}setMarkerBucket(markers);renderMarkers();closeModal();setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}
+function saveMarker(){const name=$("markerName").value.trim();if(!name){alert("請輸入名稱");return}const markers=getMarkerBucket();if(editingMarkerId){const m=markers.find(x=>x.id===editingMarkerId);if(!m)return;m.name=name;m.note=$("markerNote").value.trim();m.icon = ($("editCustomIcon") && $("editCustomIcon").value.trim()) || ($("editMarkerIcon") ? $("editMarkerIcon").value : m.icon);m.updatedAt=Date.now()}else{const icon=$("customIcon").value.trim() || ($("editCustomIcon") && $("editCustomIcon").value.trim()) || ($("editMarkerIcon") ? $("editMarkerIcon").value : selectedIcon) || selectedIcon;markers.push({id:crypto.randomUUID(),xPct:pendingPoint.xPct,yPct:pendingPoint.yPct,icon,name,note:$("markerNote").value.trim(),owner:$("playerName").value.trim(),locked:true,createdAt:Date.now()})}setMarkerBucket(markers);renderMarkers();closeModal();setStatus("已儲存在本機；要公開請按「上傳同步」。","warn")}
 
 
 function lockAllMarkers(){
