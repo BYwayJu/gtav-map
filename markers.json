@@ -505,12 +505,14 @@
       "id": "5bd0df5a-a02a-4ce6-b00e-0e17dca6c8a9",
       "xPct": 38.138087486329056,
       "yPct": 44.84787087141931,
-      "icon": "❓",
-      "name": "未知",
+      "icon": "📝",
+      "name": "衝鋒槍合約part 2(解盒子)",
       "note": "",
       "owner": "BYwayJu",
       "locked": true,
-      "createdAt": 1779479539949
+      "createdAt": 1779479539949,
+      "imageUrl": "",
+      "updatedAt": 1779616412485
     },
     {
       "id": "8c07d811-9ca8-4127-8140-d88628737160",
@@ -527,12 +529,14 @@
       "id": "f5d80441-c848-417c-9f3e-10a146a0dcdb",
       "xPct": 45.526388321313114,
       "yPct": 15.370344350298081,
-      "icon": "❓",
-      "name": "未知",
+      "icon": "📝",
+      "name": "衝鋒槍合約part 2(解盒子)",
       "note": "",
       "owner": "BYwayJu",
       "locked": true,
-      "createdAt": 1779479875833
+      "createdAt": 1779479875833,
+      "imageUrl": "",
+      "updatedAt": 1779616430238
     },
     {
       "id": "1bbcc87d-59c9-42c8-81cc-61996accd543",
