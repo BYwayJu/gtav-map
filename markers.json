@@ -578,6 +578,18 @@
       "owner": "BYwayJu",
       "locked": true,
       "createdAt": 1779567794410
+    },
+    {
+      "id": "053f1342-3ee8-43ca-9744-f4ae4f8c4610",
+      "xPct": 52.51096508149523,
+      "yPct": 88.26589170902609,
+      "icon": "📝",
+      "name": "衝鋒槍合約老闆(車廠後方排水溝)",
+      "note": "",
+      "imageUrl": "",
+      "owner": "YN",
+      "locked": true,
+      "createdAt": 1779615851314
     }
   ]
 }
