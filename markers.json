@@ -381,19 +381,6 @@
       "createdAt": 1779475317020
     },
     {
-      "id": "aee5f279-84eb-4830-bade-39cfe42ea917",
-      "xPct": 42.35506442709326,
-      "yPct": 84.89048513881801,
-      "icon": "🏎️",
-      "name": "租贓車點(已被抄)",
-      "note": "",
-      "owner": "BYwayJu",
-      "locked": true,
-      "createdAt": 1779476615508,
-      "imageUrl": "",
-      "updatedAt": 1779897815863
-    },
-    {
       "id": "97cd63c1-7463-4aa6-9f03-e00025f2a53e",
       "xPct": 57.71181548491738,
       "yPct": 31.347936655245267,
@@ -609,6 +596,18 @@
       "owner": "BallBall",
       "locked": true,
       "createdAt": 1779731340534
+    },
+    {
+      "id": "8bd13b5d-5a95-4bf2-b87f-4053bcfb2406",
+      "xPct": 49.85771855986189,
+      "yPct": 83.18113766918756,
+      "icon": "🏎️",
+      "name": "髒車",
+      "note": "",
+      "imageUrl": "",
+      "owner": "BallBall",
+      "locked": true,
+      "createdAt": 1780063286566
     }
   ]
 }
